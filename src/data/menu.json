@@ -1,0 +1,64 @@
+[
+  {
+    "id": "cmsyhxe0y00004kul00buv5ll",
+    "name": "burger",
+    "category": "Mains",
+    "price": 400,
+    "description": " burger with grilled patty and salad ",
+    "calories": 600,
+    "modelUrl": "/uploads/1787047362800_burger.glb",
+    "usdzUrl": "/uploads/1787047367781_burger.usdz",
+    "previewUrl": "/uploads/1787048570041_images__2_.jpg",
+    "createdAt": "2026-08-18T10:04:36.802+00:00",
+    "updatedAt": "2026-08-18T10:22:53.849+00:00",
+    "ingredients": [
+      {
+        "id": "cmsyikwii00074kuljocr1rgc",
+        "name": "chicken",
+        "quantity": 1,
+        "unit": "g"
+      },
+      {
+        "id": "cmsyikwii00084kulskvw1fua",
+        "name": "salad",
+        "quantity": 3,
+        "unit": "g"
+      }
+    ],
+    "allergens": []
+  },
+  {
+    "id": "cmsyiju1q00034kulq3hln4jo",
+    "name": "pizza",
+    "category": "Mains",
+    "price": 10000,
+    "description": "veg  pizza with cheese ",
+    "calories": 1200,
+    "modelUrl": "/uploads/1787048473521_pizza.glb",
+    "usdzUrl": "/uploads/1787048477021_Pizza.usdz",
+    "previewUrl": "/uploads/1787048483868_images__1_.jpg",
+    "createdAt": "2026-08-18T10:22:03.998+00:00",
+    "updatedAt": "2026-08-18T10:22:03.998+00:00",
+    "ingredients": [
+      {
+        "id": "cmsyiju1u00044kulns69ez1b",
+        "name": "dough",
+        "quantity": 1,
+        "unit": "g"
+      },
+      {
+        "id": "cmsyiju1u00054kulu3yvog88",
+        "name": "vegies",
+        "quantity": 9,
+        "unit": "g"
+      },
+      {
+        "id": "cmsyiju1u00064kulvuu032mj",
+        "name": "cheese",
+        "quantity": 4,
+        "unit": "g"
+      }
+    ],
+    "allergens": []
+  }
+]
