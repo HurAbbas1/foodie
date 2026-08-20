@@ -3,8 +3,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Smartphone, Flame, Info, RotateCw, Sparkles, Camera } from 'lucide-react';
-import ModelViewer, { ModelViewerRef } from '../3d/ModelViewer';
+import dynamic from 'next/dynamic';
+import type { ModelViewerRef } from '../3d/ModelViewer';
 import { QRCodeSVG } from 'qrcode.react';
+
+const ModelViewer = dynamic(() => import('../3d/ModelViewer'), {
+  ssr: false,
+});
+
 
 interface Ingredient {
   id: string;

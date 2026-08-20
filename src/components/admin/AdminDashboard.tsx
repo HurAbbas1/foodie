@@ -6,9 +6,14 @@ import {
   Check, X, Sparkles, AlertCircle, Eye, Search, 
   LayoutDashboard, Flame, Carrot, AlertTriangle 
 } from 'lucide-react';
-import ModelViewer from '../3d/ModelViewer';
+import dynamic from 'next/dynamic';
 import confetti from 'canvas-confetti';
 import Image from 'next/image';
+
+const ModelViewer = dynamic(() => import('../3d/ModelViewer'), {
+  ssr: false,
+});
+
 
 interface Ingredient {
   id?: string;

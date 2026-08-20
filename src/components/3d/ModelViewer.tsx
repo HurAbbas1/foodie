@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
-import { Camera, Sparkles } from 'lucide-react';
+import { Camera } from 'lucide-react';
 import React from 'react';
+import '@google/model-viewer';
 
 declare module 'react' {
   namespace JSX {
@@ -26,7 +27,6 @@ interface ModelViewerProps {
 
 const ModelViewer = forwardRef<ModelViewerRef, ModelViewerProps>(
   ({ src, iosSrc, alt, autoRotate = true, poster }, ref) => {
-    const [loaded, setLoaded] = useState(false);
     const [loadingModel, setLoadingModel] = useState(true);
     const viewerRef = useRef<any>(null);
 
@@ -39,47 +39,31 @@ const ModelViewer = forwardRef<ModelViewerRef, ModelViewerProps>(
     }));
 
     useEffect(() => {
-    // Dynamically import @google/model-viewer on the client side only
-    import('@google/model-viewer')
-      .then(() => setLoaded(true))
-      .catch((err) => console.error('Failed to load @google/model-viewer:', err));
-  }, []);
+      const viewer = viewerRef.current;
+      if (!viewer) return;
 
-  useEffect(() => {
-    const viewer = viewerRef.current;
-    if (!viewer) return;
+      // Reset loading state if the src changes
+      setLoadingModel(true);
 
-    // Reset loading state if the src changes
-    setLoadingModel(true);
-
-    const handleLoad = () => {
-      setLoadingModel(false);
-    };
-
-    const handleProgress = (event: any) => {
-      // event.detail.totalProgress ranges from 0 to 1
-      if (event.detail.totalProgress === 1) {
+      const handleLoad = () => {
         setLoadingModel(false);
-      }
-    };
+      };
 
-    viewer.addEventListener('load', handleLoad);
-    viewer.addEventListener('progress', handleProgress);
+      const handleProgress = (event: any) => {
+        // event.detail.totalProgress ranges from 0 to 1
+        if (event.detail.totalProgress === 1) {
+          setLoadingModel(false);
+        }
+      };
 
-    return () => {
-      viewer.removeEventListener('load', handleLoad);
-      viewer.removeEventListener('progress', handleProgress);
-    };
-  }, [loaded, src]); // Re-run if model-viewer script loads or model source changes
+      viewer.addEventListener('load', handleLoad);
+      viewer.addEventListener('progress', handleProgress);
 
-  if (!loaded) {
-    return (
-      <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-950/60 backdrop-blur-md rounded-2xl border border-zinc-800 text-zinc-400 min-h-[300px] md:min-h-[400px]">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-amber-500 mb-4"></div>
-        <p className="text-sm font-medium tracking-wide">Loading 3D Dining Engine...</p>
-      </div>
-    );
-  }
+      return () => {
+        viewer.removeEventListener('load', handleLoad);
+        viewer.removeEventListener('progress', handleProgress);
+      };
+    }, [src]); // Re-run if model source changes
 
   return (
     <div className="relative w-full h-full min-h-[300px] md:min-h-[400px] bg-zinc-950/40 backdrop-blur-md rounded-2xl border border-zinc-800/80 overflow-hidden group">

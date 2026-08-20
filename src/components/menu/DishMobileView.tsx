@@ -3,7 +3,13 @@
 import { useRef } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, ChevronLeft, Flame, Info, Milk, ShieldAlert, Sparkles, Wheat, Camera } from 'lucide-react';
-import ModelViewer, { ModelViewerRef } from '../3d/ModelViewer';
+import dynamic from 'next/dynamic';
+import type { ModelViewerRef } from '../3d/ModelViewer';
+
+const ModelViewer = dynamic(() => import('../3d/ModelViewer'), {
+  ssr: false,
+});
+
 
 interface Ingredient {
   id: string;
