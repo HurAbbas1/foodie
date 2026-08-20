@@ -66,6 +66,30 @@ export default function MenuGrid() {
     loadDishes();
   }, []);
 
+  // Preload 3D models in background once dishes list is fetched
+  useEffect(() => {
+    if (dishes.length === 0) return;
+
+    dishes.forEach((dish) => {
+      if (dish.modelUrl) {
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.href = dish.modelUrl;
+        link.as = 'fetch';
+        link.crossOrigin = 'anonymous';
+        document.head.appendChild(link);
+      }
+      if (dish.usdzUrl) {
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.href = dish.usdzUrl;
+        link.as = 'fetch';
+        link.crossOrigin = 'anonymous';
+        document.head.appendChild(link);
+      }
+    });
+  }, [dishes]);
+
   // Filtered dishes computation
   const filteredDishes = dishes.filter((dish) => {
     const matchesCategory = activeCategory === 'All' || dish.category.toLowerCase() === activeCategory.toLowerCase();
