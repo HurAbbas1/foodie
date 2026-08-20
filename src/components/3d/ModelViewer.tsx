@@ -113,21 +113,17 @@ const ModelViewer = forwardRef<ModelViewerRef, ModelViewerProps>(
           <span>View in Your Space</span>
         </button>
 
-        {/* Custom Loading State (Controlled directly by React State) */}
-        {loadingModel && (
-          <div
-            slot="progress-bar"
-            className="absolute inset-0 bg-zinc-950/80 flex items-center justify-center z-20"
-          >
-            <div className="flex flex-col items-center">
-              <Sparkles className="text-amber-500 animate-bounce mb-2" size={32} />
-              <span className="text-amber-500 text-xs font-semibold uppercase tracking-wider animate-pulse">
-                Plating 3D Dish...
-              </span>
-            </div>
-          </div>
-        )}
       </model-viewer>
+
+      {/* Custom Loading State (Standard React overlay with spinning circle) */}
+      {loadingModel && (
+        <div className="absolute inset-0 bg-zinc-950/80 backdrop-blur-sm flex flex-col items-center justify-center z-20">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-amber-500 mb-4"></div>
+          <span className="text-amber-500 text-xs font-semibold uppercase tracking-wider animate-pulse">
+            Plating 3D Dish...
+          </span>
+        </div>
+      )}
     </div>
   );
 });
