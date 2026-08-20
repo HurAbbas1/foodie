@@ -21,10 +21,11 @@ interface ModelViewerProps {
   iosSrc?: string;
   alt: string;
   autoRotate?: boolean;
+  poster?: string;
 }
 
 const ModelViewer = forwardRef<ModelViewerRef, ModelViewerProps>(
-  ({ src, iosSrc, alt, autoRotate = true }, ref) => {
+  ({ src, iosSrc, alt, autoRotate = true, poster }, ref) => {
     const [loaded, setLoaded] = useState(false);
     const [loadingModel, setLoadingModel] = useState(true);
     const viewerRef = useRef<any>(null);
@@ -87,6 +88,9 @@ const ModelViewer = forwardRef<ModelViewerRef, ModelViewerProps>(
         src={src}
         ios-src={iosSrc || ''}
         alt={alt}
+        poster={poster || ''}
+        loading="eager"
+        reveal="auto"
         ar
         ar-modes="webxr scene-viewer quick-look"
         camera-controls

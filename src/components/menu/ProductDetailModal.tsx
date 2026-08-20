@@ -104,6 +104,7 @@ export default function ProductDetailModal({ dish, isOpen, onClose }: ProductDet
                     iosSrc={dish.usdzUrl || undefined}
                     alt={dish.name}
                     autoRotate={autoRotate}
+                    poster={dish.previewUrl || undefined}
                   />
                 ) : (
                   <div className="w-full h-[300px] md:h-full bg-zinc-900/40 rounded-2xl border border-zinc-850 flex flex-col items-center justify-center text-zinc-500">

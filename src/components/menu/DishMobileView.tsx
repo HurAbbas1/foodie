@@ -78,6 +78,7 @@ export default function DishMobileView({ dish }: DishMobileViewProps) {
             iosSrc={dish.usdzUrl || undefined}
             alt={dish.name}
             autoRotate={true}
+            poster={dish.previewUrl || undefined}
           />
         ) : (
           <div className="w-full h-full bg-zinc-900/40 rounded-2xl border border-zinc-850 flex flex-col items-center justify-center text-zinc-500">
