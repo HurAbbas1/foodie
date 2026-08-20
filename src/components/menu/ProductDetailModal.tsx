@@ -41,7 +41,16 @@ interface ProductDetailModalProps {
 export default function ProductDetailModal({ dish, isOpen, onClose }: ProductDetailModalProps) {
   const [autoRotate, setAutoRotate] = useState(true);
   const [arUrl, setArUrl] = useState('');
+  const [animationDone, setAnimationDone] = useState(false);
   const modelViewerRef = useRef<ModelViewerRef>(null);
+
+  // Reset animationDone when modal opens/closes
+  useEffect(() => {
+    if (!isOpen) {
+      setAnimationDone(false);
+    }
+  }, [isOpen]);
+
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -84,6 +93,7 @@ export default function ProductDetailModal({ dish, isOpen, onClose }: ProductDet
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+            onAnimationComplete={() => setAnimationDone(true)}
             className="relative w-full max-w-6xl glass rounded-3xl overflow-hidden shadow-2xl border border-zinc-800/80 z-10 flex flex-col md:flex-row max-h-[90vh] md:max-h-[85vh] text-zinc-100"
           >
             {/* Close Button */}
@@ -97,7 +107,7 @@ export default function ProductDetailModal({ dish, isOpen, onClose }: ProductDet
             {/* Left Side: 3D Model Viewer & Controls */}
             <div className="w-full md:w-1/2 p-6 flex flex-col justify-between border-b md:border-b-0 md:border-r border-zinc-800/60 bg-zinc-950/20">
               <div className="flex-1 flex flex-col justify-center min-h-[300px] md:min-h-0 relative">
-                {dish.modelUrl ? (
+                {dish.modelUrl && animationDone ? (
                   <ModelViewer
                     ref={modelViewerRef}
                     src={dish.modelUrl}
@@ -106,6 +116,22 @@ export default function ProductDetailModal({ dish, isOpen, onClose }: ProductDet
                     autoRotate={autoRotate}
                     poster={dish.previewUrl || undefined}
                   />
+                ) : dish.modelUrl ? (
+                  <div className="w-full h-[300px] md:h-full relative rounded-2xl overflow-hidden border border-zinc-800/80 bg-zinc-950/60 flex items-center justify-center">
+                    {dish.previewUrl && (
+                      <img 
+                        src={dish.previewUrl} 
+                        alt={dish.name} 
+                        className="w-full h-full object-cover absolute inset-0 opacity-60"
+                      />
+                    )}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+                      <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-amber-500 mb-4"></div>
+                      <span className="text-amber-500 text-xs font-semibold uppercase tracking-wider animate-pulse">
+                        Plating 3D Dish...
+                      </span>
+                    </div>
+                  </div>
                 ) : (
                   <div className="w-full h-[300px] md:h-full bg-zinc-900/40 rounded-2xl border border-zinc-850 flex flex-col items-center justify-center text-zinc-500">
                     <Info size={40} className="mb-2 text-zinc-600" />
