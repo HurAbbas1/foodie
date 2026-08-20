@@ -123,16 +123,25 @@ export default function DishMobileView({ dish }: DishMobileViewProps) {
             {dish.description}
           </p>
 
-          {/* AR Action Button */}
+          {/* AR Action Buttons */}
           {dish.modelUrl && (
-            <button
-              type="button"
-              onClick={() => modelViewerRef.current?.activateAR()}
-              className="w-full mb-6 flex items-center justify-center gap-2.5 bg-amber-500 hover:bg-amber-600 active:scale-95 text-zinc-950 font-extrabold py-3 px-6 rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.35)] transition-all text-sm border border-amber-400 cursor-pointer select-none"
-            >
-              <Camera size={16} className="animate-pulse" />
-              <span>See in your environment</span>
-            </button>
+            <div className="flex flex-col gap-3 mb-6">
+              <button
+                type="button"
+                onClick={() => modelViewerRef.current?.activateAR()}
+                className="w-full flex items-center justify-center gap-2.5 bg-amber-500 hover:bg-amber-600 active:scale-95 text-zinc-950 font-extrabold py-3 px-6 rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.35)] transition-all text-sm border border-amber-400 cursor-pointer select-none"
+              >
+                <Camera size={16} className="animate-pulse" />
+                <span>See in your environment</span>
+              </button>
+
+              <Link
+                href={`/ar-marker/${dish.id}`}
+                className="w-full flex items-center justify-center gap-2.5 bg-zinc-900 hover:bg-zinc-800 active:scale-95 text-zinc-200 hover:text-white font-bold py-3 px-6 rounded-xl border border-zinc-800 transition-all text-xs cursor-pointer select-none text-center"
+              >
+                <span>Try Marker-Based AR (Fix to Hiro Marker)</span>
+              </Link>
+            </div>
           )}
 
           {/* Allergens Warning */}

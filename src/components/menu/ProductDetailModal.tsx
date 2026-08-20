@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Smartphone, Flame, Info, RotateCw, Sparkles, Camera } from 'lucide-react';
+import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import type { ModelViewerRef } from '../3d/ModelViewer';
 import { QRCodeSVG } from 'qrcode.react';
@@ -179,14 +180,23 @@ export default function ProductDetailModal({ dish, isOpen, onClose }: ProductDet
                         </div>
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() => modelViewerRef.current?.activateAR()}
-                        className="lg:hidden w-full sm:w-auto flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 active:scale-95 text-zinc-950 font-bold py-2.5 px-4 rounded-xl shadow-[0_0_15px_rgba(245,158,11,0.3)] transition-all text-xs border border-amber-400 cursor-pointer select-none"
-                      >
-                        <Camera size={14} className="animate-pulse" />
-                        <span>See in your environment</span>
-                      </button>
+                      <div className="lg:hidden flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                        <button
+                          type="button"
+                          onClick={() => modelViewerRef.current?.activateAR()}
+                          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 active:scale-95 text-zinc-950 font-bold py-2.5 px-4 rounded-xl shadow-[0_0_15px_rgba(245,158,11,0.3)] transition-all text-xs border border-amber-400 cursor-pointer select-none"
+                        >
+                          <Camera size={14} className="animate-pulse" />
+                          <span>See in your environment</span>
+                        </button>
+
+                        <Link
+                          href={`/ar-marker/${dish.id}`}
+                          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 active:scale-95 text-zinc-200 hover:text-white font-bold py-2.5 px-4 rounded-xl border border-zinc-800 transition-all text-xs cursor-pointer select-none text-center"
+                        >
+                          <span>Hiro Marker AR</span>
+                        </Link>
+                      </div>
                     </>
                   )}
                 </div>
