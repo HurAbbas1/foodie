@@ -92,7 +92,7 @@ const ModelViewer = forwardRef<ModelViewerRef, ModelViewerProps>(
         loading="eager"
         reveal="auto"
         ar
-        ar-modes="webxr scene-viewer quick-look"
+        ar-modes="scene-viewer quick-look webxr"
         camera-controls
         auto-rotate={autoRotate ? true : undefined}
         shadow-intensity="1.5"
