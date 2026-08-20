@@ -114,18 +114,18 @@
 
         // Adjust scale based on model type (to prevent it being too huge/tiny)
         if (modelUrl.toLowerCase().includes('burger')) {
-          modelEntity.setAttribute('scale', '0.35 0.35 0.35');
-          modelEntity.setAttribute('position', '0 0.5 0');
+          modelEntity.setAttribute('scale', '3.5 3.5 3.5');
+          modelEntity.setAttribute('position', '0 2.0 0');
           // Add gentle rotation animation
           modelEntity.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 12000; easing: linear');
         } else if (modelUrl.toLowerCase().includes('pizza')) {
-          // Pizza is scaled up to be larger than the marker
-          modelEntity.setAttribute('scale', '0.04 0.04 0.04');
-          modelEntity.setAttribute('position', '0 0.2 0');
+          // Pizza is scaled up 10x more to be larger than the marker
+          modelEntity.setAttribute('scale', '0.4 0.4 0.4');
+          modelEntity.setAttribute('position', '0 1.0 0');
           // Add gentle rotation animation
           modelEntity.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 12000; easing: linear');
         } else {
-          modelEntity.setAttribute('scale', '2.0 2.0 2.0');
+          modelEntity.setAttribute('scale', '20.0 20.0 20.0');
           modelEntity.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 12000; easing: linear');
         }
 
