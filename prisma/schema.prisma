@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Dish {
+  id          String   @id @default(cuid())
+  name        String
+  category    String   // Appetizers, Mains, Desserts, Beverages
+  price       Float
+  description String
+  calories    Int?
+  
+  // File URLs stored locally
+  modelUrl    String?  // .glb
+  usdzUrl     String?  // .usdz (iOS Quick Look support)
+  previewUrl  String?  // Thumbnail preview image
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  ingredients Ingredient[]
+  allergens   Allergen[]
+}
+
+model Ingredient {
+  id       String @id @default(cuid())
+  name     String
+  quantity Float
+  unit     String // g, ml, pcs, etc.
+  dishId   String
+  dish     Dish   @relation(fields: [dishId], references: [id], onDelete: Cascade)
+}
+
+model Allergen {
+  id     String @id @default(cuid())
+  name   String // e.g. Gluten, Dairy, Nuts, Eggs
+  dishId String
+  dish   Dish   @relation(fields: [dishId], references: [id], onDelete: Cascade)
+}
