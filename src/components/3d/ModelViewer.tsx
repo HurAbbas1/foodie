@@ -139,8 +139,8 @@ const ModelViewer = forwardRef<ModelViewerRef, ModelViewerProps>(
         environment-image="neutral"
         ar-placement="floor"
         interaction-prompt="auto"
-        className="w-full h-full"
-        style={{ width: '100%', height: '100%', outline: 'none' }}
+        className="w-full h-full block"
+        style={{ display: 'block', width: '100%', height: '100%', outline: 'none' }}
       >
         {/* Custom AR Button */}
         <button
