@@ -6,10 +6,10 @@ import { ChefHat, Heart } from 'lucide-react';
 export default function Home() {
   return (
     <div className="relative min-h-screen bg-zinc-950 text-zinc-100 flex flex-col overflow-hidden">
-      {/* Background Rotating Watermark Logo */}
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden flex items-center justify-center opacity-[0.025] select-none">
+      {/* Background Rotating Watermark Logo (Transparent circular badge with no white canvas) */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden flex items-center justify-center opacity-[0.03] select-none">
         <img 
-          src="/logo-badge.jpg" 
+          src="/logo-badge-transparent.png" 
           alt="MenuVerse Background Logo" 
           className="w-[850px] h-[850px] object-contain animate-[spin_180s_linear_infinite]"
         />

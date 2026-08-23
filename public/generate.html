@@ -91,6 +91,32 @@
         ctx.drawImage(logoImg, 110, 110, 180, 180);
       }
 
+      // Function to remove white canvas background from the badge image to make it transparent
+      function makeLogoTransparent(img) {
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = img.naturalWidth || img.width;
+        tempCanvas.height = img.naturalHeight || img.height;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.drawImage(img, 0, 0);
+
+        const imgData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+        const data = imgData.data;
+
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i];
+          const g = data[i+1];
+          const b = data[i+2];
+
+          // If pixel is pure white or very close to white background, make it transparent
+          if (r > 248 && g > 248 && b > 248) {
+            data[i+3] = 0; // Set alpha channel to 0 (transparent)
+          }
+        }
+
+        tempCtx.putImageData(imgData, 0, 0);
+        return tempCanvas.toDataURL('image/png');
+      }
+
       const logo = new Image();
       logo.src = '/logo-badge.jpg';
       logo.onload = () => {
@@ -117,6 +143,9 @@
           statusDiv.innerText = "Saving files to local server...";
 
           const markerBase64 = canvas.toDataURL('image/png');
+          
+          // Generate transparent background version of the badge logo
+          const transparentLogoBase64 = makeLogoTransparent(logo);
 
           // Send to Next.js API to save locally
           fetch('/api/save-marker', {
@@ -124,13 +153,14 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               pattString: patternFileString,
-              markerBase64: markerBase64
+              markerBase64: markerBase64,
+              transparentLogoBase64: transparentLogoBase64
             })
           })
           .then(res => res.json())
           .then(data => {
             if (data.success) {
-              statusDiv.innerText = "Success! Generated 'logo.patt' and 'logo-marker.png' and saved them to your public/ directory.";
+              statusDiv.innerText = "Success! Generated 'logo.patt', 'logo-marker.png', and transparent 'logo-badge-transparent.png' in your public/ directory.";
             } else {
               statusDiv.innerText = "Error: " + data.error;
             }
