@@ -71,7 +71,7 @@
     <div id="ar-loader">
       <div class="spinner"></div>
       <div class="loader-title">Opening Live AR Camera...</div>
-      <div class="loader-sub">Loading 3D model & normalizing proportions</div>
+      <div class="loader-sub">Loading 3D model & calculating 2x QR scale</div>
     </div>
 
     <!-- Live Status Pill -->
@@ -167,23 +167,28 @@
         isDragging = false;
       });
 
-      // Three.js Bounding Box Normalization helper
-      function setupProportionalMesh(entity, targetScale) {
+      // Three.js Bounding Box Normalization (guarantees exact 2x QR marker size)
+      function setupProportionalMesh(entity, targetMultiplier = 2.0) {
         entity.addEventListener('model-loaded', () => {
           const mesh = entity.getObject3D('mesh');
           if (mesh) {
             // Compute true 3D geometric bounding box
             const bbox = new THREE.Box3().setFromObject(mesh);
+            const size = new THREE.Vector3();
+            bbox.getSize(size);
+            const maxDim = Math.max(size.x, size.y, size.z) || 1;
+
             const center = new THREE.Vector3();
             bbox.getCenter(center);
 
             // Center mesh around entity origin
             mesh.position.sub(center);
             // Align bottom base flush on the marker plane (Y = 0)
-            mesh.position.y += (bbox.max.y - bbox.min.y) / 2;
+            mesh.position.y += size.y / 2;
 
-            // Uniform 1:1:1 scale matching original 3D dimensions
-            entity.setAttribute('scale', `${targetScale} ${targetScale} ${targetScale}`);
+            // Scale mesh so its largest dimension is EXACTLY targetMultiplier (2.0 = 2x QR marker size)
+            const scaleFactor = (1.0 / maxDim) * targetMultiplier;
+            entity.setAttribute('scale', `${scaleFactor} ${scaleFactor} ${scaleFactor}`);
           }
           loader.style.display = 'none';
         });
@@ -208,12 +213,10 @@
             finalUrl = URL.createObjectURL(blob) + '#.glb';
           }
 
-          // Target uniform scale for 1:1 true proportions
-          let targetScale = 0.35;
-          if (modelUrl.toLowerCase().includes('burger')) {
-            targetScale = 0.45;
-          } else if (modelUrl.toLowerCase().includes('pizza')) {
-            targetScale = 0.25;
+          // Target scale: 2.0 = EXACTLY 2x the physical QR marker size
+          let targetScale = 2.0;
+          if (modelUrl.toLowerCase().includes('pizza')) {
+            targetScale = 2.2;
           }
 
           const customMarker = document.getElementById('custom-marker');
@@ -230,7 +233,7 @@
           // Dynamic marker tracking status feedback
           [customMarker, hiroMarker].forEach(marker => {
             marker.addEventListener('markerFound', () => {
-              statusText.innerHTML = '✓ <span style="color:#10b981">Tracking Live! Drag finger to tilt 360°</span>';
+              statusText.innerHTML = '✓ <span style="color:#10b981">Tracking Live (2x Size)! Drag to tilt</span>';
             });
 
             marker.addEventListener('markerLost', () => {
