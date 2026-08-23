@@ -11,30 +11,6 @@ export default function HeroSection() {
       <div className="absolute bottom-1/4 right-1/10 w-96 h-96 rounded-full bg-rose-500/5 blur-[120px] pointer-events-none"></div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-        {/* Full Brand Logo Banner (Clean transparent png logo overlay) */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="flex justify-center mb-10 select-none"
-        >
-          <div className="relative w-28 h-28 overflow-hidden flex items-center justify-center hover:scale-[1.02] transition-transform duration-300">
-            <img 
-              src="/logo-transparent.png" 
-              alt="MenuVerse Logo Icon" 
-              className="absolute left-0 top-0 h-full w-auto max-w-none object-cover"
-              style={{
-                // Soft, natural gold-tinted drop shadow with standard natural colors
-                filter: 'brightness(1.05) drop-shadow(0 8px 16px rgba(197, 155, 39, 0.15))'
-              }}
-              onError={(e) => {
-                e.currentTarget.src = "/logo-badge-transparent.png";
-                e.currentTarget.style.position = "static";
-                e.currentTarget.style.width = "100%";
-              }}
-            />
-          </div>
-        </motion.div>
 
         {/* Hero Title */}
         <motion.h1
