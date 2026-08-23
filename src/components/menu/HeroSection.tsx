@@ -22,7 +22,10 @@ export default function HeroSection() {
             <img 
               src="/logo-transparent.png" 
               alt="MenuVerse Logo" 
-              className="w-full h-auto object-contain brightness-110 drop-shadow-[0_4px_20px_rgba(255,255,255,0.05)]"
+              className="w-full h-auto object-contain transition-all duration-300"
+              style={{
+                filter: 'brightness(1.6) contrast(1.1) drop-shadow(0 0 2px rgba(245, 238, 220, 0.9)) drop-shadow(0 0 10px rgba(197, 155, 39, 0.7)) drop-shadow(0 0 20px rgba(245, 158, 11, 0.4))'
+              }}
               onError={(e) => {
                 e.currentTarget.src = "/logo.jpg";
                 e.currentTarget.parentElement?.classList.add("bg-[#f5eedc]", "px-6", "py-3.5", "rounded-2xl", "border", "border-[#d9c3b0]/35");
