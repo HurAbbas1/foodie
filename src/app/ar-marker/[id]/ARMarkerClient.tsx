@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Camera, ScanLine } from 'lucide-react';
+import { ArrowLeft, Camera, Download, ScanLine } from 'lucide-react';
 
 interface ARMarkerClientProps {
   dishId: string;
@@ -64,7 +64,7 @@ export default function ARMarkerClient({ dishId, dishName, modelUrl }: ARMarkerC
           {/* Instructions */}
           <div className="flex flex-col gap-2 text-left max-w-xs w-full">
             {[
-              'Print this marker or display it on a screen',
+              'Download & print the QR marker below',
               'Place it on a flat surface (table, floor, etc.)',
               'Tap Start Camera and point your phone at it',
               'Watch the 3D model appear on top!',
@@ -78,14 +78,27 @@ export default function ARMarkerClient({ dishId, dishName, modelUrl }: ARMarkerC
             ))}
           </div>
 
-          {/* Start Button */}
-          <button
-            onClick={() => setStarted(true)}
-            className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 active:scale-95 text-zinc-950 font-black py-3.5 px-8 rounded-2xl shadow-[0_0_25px_rgba(245,158,11,0.4)] transition-all text-sm uppercase tracking-wider"
-          >
-            <Camera size={18} />
-            Start Camera
-          </button>
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full max-w-xs">
+            {/* Download QR Button */}
+            <a
+              href="/logo-marker.png"
+              download="menuverse-qr-marker.png"
+              className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 active:scale-95 text-zinc-200 hover:text-white font-bold py-3.5 px-6 rounded-2xl border border-zinc-700 hover:border-zinc-600 transition-all text-sm"
+            >
+              <Download size={16} />
+              Download QR
+            </a>
+
+            {/* Start Camera Button */}
+            <button
+              onClick={() => setStarted(true)}
+              className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 active:scale-95 text-zinc-950 font-black py-3.5 px-6 rounded-2xl shadow-[0_0_25px_rgba(245,158,11,0.4)] transition-all text-sm uppercase tracking-wider"
+            >
+              <Camera size={16} />
+              Start Camera
+            </button>
+          </div>
         </div>
       )}
 
