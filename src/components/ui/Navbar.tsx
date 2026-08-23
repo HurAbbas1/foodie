@@ -10,11 +10,15 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="bg-gradient-to-tr from-amber-500 to-rose-600 p-2 rounded-xl text-zinc-950 shadow-[0_0_15px_rgba(245,158,11,0.3)] transition-transform group-hover:scale-105">
-              <ChefHat size={22} className="stroke-[2.5]" />
+            <div className="relative w-10 h-10 rounded-xl overflow-hidden border border-zinc-800/80 shadow-[0_0_15px_rgba(245,158,11,0.15)] transition-transform group-hover:scale-105">
+              <img 
+                src="/logo-badge.jpg" 
+                alt="MenuVerse Logo" 
+                className="w-full h-full object-cover"
+              />
             </div>
             <span className="font-bold text-lg sm:text-xl tracking-tight bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">
-              Aura<span className="text-amber-500 font-extrabold">Bite</span>
+              Menu<span className="text-amber-500 font-extrabold">Verse</span>
             </span>
             <span className="hidden xs:inline-block text-[10px] uppercase font-bold tracking-widest bg-zinc-800 border border-zinc-700/80 text-zinc-400 px-2 py-0.5 rounded-full">
               AR Menu

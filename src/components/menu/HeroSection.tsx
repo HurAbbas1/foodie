@@ -11,15 +11,20 @@ export default function HeroSection() {
       <div className="absolute bottom-1/4 right-1/10 w-96 h-96 rounded-full bg-rose-500/5 blur-[120px] pointer-events-none"></div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-        {/* Floating badge */}
+        {/* Full Brand Logo Banner */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-amber-500/30 bg-amber-500/5 text-amber-500 text-xs font-bold uppercase tracking-widest mb-8"
+          className="flex justify-center mb-8"
         >
-          <Sparkles size={14} className="animate-spin-slow" />
-          <span>Next-Generation Dining</span>
+          <div className="bg-[#f5eedc] px-6 py-3.5 rounded-2xl shadow-[0_10px_25px_rgba(0,0,0,0.25)] border border-[#d9c3b0]/35 flex items-center justify-center max-w-[260px] sm:max-w-[300px] hover:scale-[1.02] transition-transform duration-300">
+            <img 
+              src="/logo.jpg" 
+              alt="MenuVerse Logo" 
+              className="w-full h-auto object-contain"
+            />
+          </div>
         </motion.div>
 
         {/* Hero Title */}

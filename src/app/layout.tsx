@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AuraBite | Interactive 3D & WebAR Food Menu",
+  title: "MenuVerse | Interactive 3D & WebAR Food Menu",
   description: "Experience fine dining in Augmented Reality. Scan, view, and order with a local interactive 3D menu.",
 };
 

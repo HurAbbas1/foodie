@@ -74,7 +74,7 @@ export default function FoodCard({ dish, onViewDetails }: FoodCardProps) {
             />
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center text-zinc-600 bg-gradient-to-br from-zinc-900 to-zinc-950">
-              <span className="text-4xl font-extrabold tracking-widest text-zinc-800">Aura</span>
+              <span className="text-3xl font-black tracking-wider text-zinc-800 uppercase">MenuVerse</span>
               <span className="text-xs uppercase font-semibold tracking-wider text-zinc-600 mt-2">No Preview Available</span>
             </div>
           )}
