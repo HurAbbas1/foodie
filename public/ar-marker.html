@@ -9,7 +9,29 @@
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { background: transparent; overflow: hidden; width: 100vw; height: 100vh; font-family: system-ui, -apple-system, sans-serif; }
+      html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background: #000; font-family: system-ui, -apple-system, sans-serif; }
+
+      /* Force AR.js Video and Canvas to fill 100% of viewport without black bars */
+      .arjs-video, video {
+        width: 100vw !important;
+        height: 100vh !important;
+        object-fit: cover !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        margin: 0 !important;
+        z-index: 1 !important;
+      }
+
+      canvas.a-canvas {
+        width: 100vw !important;
+        height: 100vh !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        margin: 0 !important;
+        z-index: 2 !important;
+      }
 
       /* Fullscreen AR Loader */
       #ar-loader {
@@ -71,30 +93,36 @@
       renderer="logarithmicDepthBuffer: true; antialias: true; colorManagement: true;"
       vr-mode-ui="enabled: false"
     >
+      <!-- Bright Ambient and Directional Lights for PBR GLTF Rendering -->
+      <a-entity light="type: ambient; color: #ffffff; intensity: 1.8;"></a-entity>
+      <a-entity light="type: directional; color: #ffffff; intensity: 1.4;" position="-1 4 2"></a-entity>
+
       <!-- Custom MenuVerse Pattern Marker -->
       <a-marker
         type="pattern"
         url="/logo.patt"
         patternRatio="0.75"
         id="custom-marker"
+        emitevents="true"
         smooth="true"
-        smoothCount="8"
+        smoothCount="5"
         smoothTolerance="0.01"
-        smoothThreshold="3"
+        smoothThreshold="2"
       >
-        <a-entity id="custom-model" position="0 0.3 0" scale="1 1 1"></a-entity>
+        <a-entity id="custom-model" position="0 0.2 0" scale="0.8 0.8 0.8"></a-entity>
       </a-marker>
 
       <!-- Standard Hiro Marker Fallback -->
       <a-marker
         preset="hiro"
         id="hiro-marker"
+        emitevents="true"
         smooth="true"
-        smoothCount="8"
+        smoothCount="5"
         smoothTolerance="0.01"
-        smoothThreshold="3"
+        smoothThreshold="2"
       >
-        <a-entity id="hiro-model" position="0 0.3 0" scale="1 1 1"></a-entity>
+        <a-entity id="hiro-model" position="0 0.2 0" scale="0.8 0.8 0.8"></a-entity>
       </a-marker>
 
       <a-entity camera></a-entity>
@@ -103,37 +131,22 @@
     <script>
       const loader = document.getElementById('ar-loader');
       const statusText = document.getElementById('status-text');
-      const reLockBtn = document.getElementById('re-lock-btn');
+      const reLockBtn = document.getElementById('reset-btn');
       const urlParams = new URLSearchParams(window.location.search);
       const modelUrl = urlParams.get('modelUrl');
 
-      let isAnchored = false;
-
-      // Lock 3D model position in world space once marker is detected so it never vanishes
-      function lockModelAnchor(marker, entity) {
-        if (isAnchored) return;
-        isAnchored = true;
-
-        try {
-          const worldPos = new THREE.Vector3();
-          const worldQuaternion = new THREE.Quaternion();
-          const worldScale = new THREE.Vector3();
-
-          marker.object3D.matrixWorld.decompose(worldPos, worldQuaternion, worldScale);
-
-          // Re-parent model to scene root so markerLost won't hide it
-          const scene = document.querySelector('a-scene');
-          scene.object3D.add(entity.object3D);
-
-          entity.object3D.position.copy(worldPos);
-          entity.object3D.quaternion.copy(worldQuaternion);
-          entity.object3D.visible = true;
-
+      // Make marker persistent: once detected, keep model visible even if marker leaves camera view
+      function makeMarkerPersistent(marker) {
+        marker.addEventListener('markerFound', () => {
+          marker.object3D.visible = true;
           statusText.innerHTML = '✓ <span style="color:#10b981">Model Fixed on Marker!</span>';
-          reLockBtn.style.display = 'inline-block';
-        } catch (e) {
-          console.log('Anchor lock:', e);
-        }
+          if (reLockBtn) reLockBtn.style.display = 'inline-block';
+        });
+
+        marker.addEventListener('markerLost', () => {
+          // Force marker to remain visible at its last known position
+          marker.object3D.visible = true;
+        });
       }
 
       async function initAR() {
@@ -155,15 +168,15 @@
             finalUrl = URL.createObjectURL(blob) + '#.glb';
           }
 
-          // Scale parameters
-          let scaleStr = '1.5 1.5 1.5';
-          let posStr = '0 0.3 0';
+          // Scale & Position parameters
+          let scaleStr = '0.8 0.8 0.8';
+          let posStr = '0 0.2 0';
 
           if (modelUrl.toLowerCase().includes('burger')) {
-            scaleStr = '1.8 1.8 1.8';
-            posStr = '0 0.4 0';
+            scaleStr = '1.0 1.0 1.0';
+            posStr = '0 0.3 0';
           } else if (modelUrl.toLowerCase().includes('pizza')) {
-            scaleStr = '0.25 0.25 0.25';
+            scaleStr = '0.15 0.15 0.15';
             posStr = '0 0.1 0';
           }
 
@@ -179,11 +192,11 @@
             entity.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 12000; easing: linear');
           });
 
-          // Persistent Anchor Locking
-          customMarker.addEventListener('markerFound', () => lockModelAnchor(customMarker, customModel));
-          hiroMarker.addEventListener('markerFound', () => lockModelAnchor(hiroMarker, hiroModel));
+          // Enable persistent visibility on both markers
+          makeMarkerPersistent(customMarker);
+          makeMarkerPersistent(hiroMarker);
 
-          // Hide loader when model is parsed
+          // Hide loader when model finishes parsing in Three.js
           customModel.addEventListener('model-loaded', () => loader.style.display = 'none');
           hiroModel.addEventListener('model-loaded', () => loader.style.display = 'none');
 
