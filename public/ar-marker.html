@@ -131,26 +131,33 @@
       let hiroModelEntity = null;
       let isDragging = false;
       let previousTouchX = 0;
+      let previousTouchY = 0;
       let currentRotationY = 0;
+      let currentRotationX = 0;
 
-      // Enable touch drag left-to-right rotation control
+      // Enable 2-axis touch drag (Left/Right & Up/Down tilt controls)
       window.addEventListener('touchstart', (e) => {
         if (e.touches.length === 1) {
           isDragging = true;
           previousTouchX = e.touches[0].clientX;
+          previousTouchY = e.touches[0].clientY;
         }
       });
 
       window.addEventListener('touchmove', (e) => {
         if (isDragging && e.touches.length === 1) {
           const deltaX = e.touches[0].clientX - previousTouchX;
+          const deltaY = e.touches[0].clientY - previousTouchY;
           previousTouchX = e.touches[0].clientX;
+          previousTouchY = e.touches[0].clientY;
+
           currentRotationY += deltaX * 0.8;
+          currentRotationX = Math.max(-80, Math.min(80, currentRotationX + deltaY * 0.8));
 
           [customModelEntity, hiroModelEntity].forEach(entity => {
             if (entity) {
               entity.removeAttribute('animation');
-              entity.setAttribute('rotation', `0 ${currentRotationY} 0`);
+              entity.setAttribute('rotation', `${currentRotationX} ${currentRotationY} 0`);
             }
           });
         }
@@ -206,7 +213,7 @@
           // Dynamic marker tracking status feedback
           [customMarker, hiroMarker].forEach(marker => {
             marker.addEventListener('markerFound', () => {
-              statusText.innerHTML = '✓ <span style="color:#10b981">Tracking Live! Drag finger to rotate</span>';
+              statusText.innerHTML = '✓ <span style="color:#10b981">Tracking Live! Drag finger to tilt 360°</span>';
             });
 
             marker.addEventListener('markerLost', () => {
