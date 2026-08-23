@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <div className="relative min-h-screen bg-zinc-950 text-zinc-100 flex flex-col overflow-hidden">
       {/* Background Rotating Watermark Logo (Transparent circular badge with no white canvas) */}
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden flex items-center justify-center opacity-[0.08] select-none">
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden flex items-center justify-center opacity-[0.14] select-none">
         <img 
           src="/logo-badge-transparent.png" 
           alt="MenuVerse Background Logo" 
