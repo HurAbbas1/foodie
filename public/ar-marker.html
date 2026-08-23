@@ -71,7 +71,7 @@
     <div id="ar-loader">
       <div class="spinner"></div>
       <div class="loader-title">Opening Live AR Camera...</div>
-      <div class="loader-sub">Loading 3D model & preparing real-time tracking</div>
+      <div class="loader-sub">Loading 3D model & normalizing proportions</div>
     </div>
 
     <!-- Live Status Pill -->
@@ -90,7 +90,7 @@
       <a-entity light="type: ambient; color: #ffffff; intensity: 1.8;"></a-entity>
       <a-entity light="type: directional; color: #ffffff; intensity: 1.4;" position="-1 4 2"></a-entity>
 
-      <!-- Custom MenuVerse Pattern Marker (Follows marker dynamically) -->
+      <!-- Custom MenuVerse Pattern Marker -->
       <a-marker
         type="pattern"
         url="/logo.patt"
@@ -102,10 +102,10 @@
         smoothTolerance="0.01"
         smoothThreshold="2"
       >
-        <a-entity id="custom-model" position="0 0.3 0" scale="2.0 2.0 2.0"></a-entity>
+        <a-entity id="custom-model"></a-entity>
       </a-marker>
 
-      <!-- Standard Hiro Marker Fallback (Follows marker dynamically) -->
+      <!-- Standard Hiro Marker Fallback -->
       <a-marker
         preset="hiro"
         id="hiro-marker"
@@ -115,7 +115,7 @@
         smoothTolerance="0.01"
         smoothThreshold="2"
       >
-        <a-entity id="hiro-model" position="0 0.3 0" scale="2.0 2.0 2.0"></a-entity>
+        <a-entity id="hiro-model"></a-entity>
       </a-marker>
 
       <a-entity camera></a-entity>
@@ -167,6 +167,28 @@
         isDragging = false;
       });
 
+      // Three.js Bounding Box Normalization helper
+      function setupProportionalMesh(entity, targetScale) {
+        entity.addEventListener('model-loaded', () => {
+          const mesh = entity.getObject3D('mesh');
+          if (mesh) {
+            // Compute true 3D geometric bounding box
+            const bbox = new THREE.Box3().setFromObject(mesh);
+            const center = new THREE.Vector3();
+            bbox.getCenter(center);
+
+            // Center mesh around entity origin
+            mesh.position.sub(center);
+            // Align bottom base flush on the marker plane (Y = 0)
+            mesh.position.y += (bbox.max.y - bbox.min.y) / 2;
+
+            // Uniform 1:1:1 scale matching original 3D dimensions
+            entity.setAttribute('scale', `${targetScale} ${targetScale} ${targetScale}`);
+          }
+          loader.style.display = 'none';
+        });
+      }
+
       async function initAR() {
         if (!modelUrl) {
           loader.innerHTML = '<div style="color:#ef4444;font-weight:700;">Error: No model URL provided</div>';
@@ -186,16 +208,12 @@
             finalUrl = URL.createObjectURL(blob) + '#.glb';
           }
 
-          // 2x Scaled parameters
-          let scaleStr = '1.6 1.6 1.6';
-          let posStr = '0 0.3 0';
-
+          // Target uniform scale for 1:1 true proportions
+          let targetScale = 0.35;
           if (modelUrl.toLowerCase().includes('burger')) {
-            scaleStr = '2.0 2.0 2.0';
-            posStr = '0 0.4 0';
+            targetScale = 0.45;
           } else if (modelUrl.toLowerCase().includes('pizza')) {
-            scaleStr = '0.35 0.35 0.35';
-            posStr = '0 0.2 0';
+            targetScale = 0.25;
           }
 
           const customMarker = document.getElementById('custom-marker');
@@ -205,9 +223,8 @@
 
           [customModelEntity, hiroModelEntity].forEach(entity => {
             entity.setAttribute('gltf-model', finalUrl);
-            entity.setAttribute('scale', scaleStr);
-            entity.setAttribute('position', posStr);
             entity.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 12000; easing: linear');
+            setupProportionalMesh(entity, targetScale);
           });
 
           // Dynamic marker tracking status feedback
@@ -220,10 +237,6 @@
               statusText.innerHTML = 'Point camera at the <span>MenuVerse Marker</span>';
             });
           });
-
-          // Hide loader when model finishes parsing in Three.js
-          customModelEntity.addEventListener('model-loaded', () => loader.style.display = 'none');
-          hiroModelEntity.addEventListener('model-loaded', () => loader.style.display = 'none');
 
           setTimeout(() => {
             if (loader.style.display !== 'none') {
