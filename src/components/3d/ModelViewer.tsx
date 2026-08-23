@@ -28,7 +28,7 @@ interface ModelViewerProps {
 const ModelViewer = forwardRef<ModelViewerRef, ModelViewerProps>(
   ({ src, iosSrc, alt, autoRotate = true, poster }, ref) => {
     const [loadingModel, setLoadingModel] = useState(true);
-    const [processedSrc, setProcessedSrc] = useState(src);
+    const [processedSrc, setProcessedSrc] = useState(src.endsWith('.gz') ? '' : src);
     const viewerRef = useRef<any>(null);
 
     useImperativeHandle(ref, () => ({
@@ -48,6 +48,7 @@ const ModelViewer = forwardRef<ModelViewerRef, ModelViewerProps>(
         if (!src) return;
 
         if (src.endsWith('.gz')) {
+          setProcessedSrc('');
           setLoadingModel(true);
           try {
             const response = await fetch(src);
