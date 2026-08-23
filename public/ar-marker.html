@@ -26,7 +26,7 @@
       }
       @keyframes spin { to { transform: rotate(360deg); } }
       .loader-title { font-size: 15px; font-weight: 700; color: #f59e0b; letter-spacing: 0.05em; }
-      .loader-sub { font-size: 13px; color: #a1a1aa; max-w: 260px; line-height: 1.4; }
+      .loader-sub { font-size: 13px; color: #a1a1aa; max-width: 260px; line-height: 1.4; }
 
       /* Real-time AR Instruction Pill */
       .ar-instruction-pill {
@@ -36,11 +36,17 @@
         border: 1px solid rgba(245, 158, 11, 0.3);
         color: #f4f4f5; padding: 10px 22px; border-radius: 99px;
         font-size: 13px; font-weight: 600; text-align: center;
-        z-index: 999; pointer-events: none;
+        z-index: 999; pointer-events: auto;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-        white-space: nowrap;
+        white-space: nowrap; display: flex; items-center; gap: 8px;
       }
       .ar-instruction-pill span { color: #f59e0b; font-weight: 700; }
+
+      .reset-btn {
+        background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.4);
+        color: #f59e0b; padding: 4px 10px; border-radius: 12px;
+        font-size: 11px; font-weight: 700; cursor: pointer; margin-left: 8px;
+      }
     </style>
   </head>
   <body>
@@ -53,8 +59,9 @@
     </div>
 
     <!-- Live AR Overlay Guide -->
-    <div class="ar-instruction-pill">
-      Point camera at the <span>MenuVerse Marker</span>
+    <div class="ar-instruction-pill" id="pill">
+      <span id="pill-text">Point camera at <span>MenuVerse Marker</span></span>
+      <button class="reset-btn" id="reset-btn" style="display:none" onclick="resetAnchor()">Re-lock</button>
     </div>
 
     <!-- AR.js Real-time Tracking Scene -->
@@ -64,10 +71,11 @@
       renderer="logarithmicDepthBuffer: true; antialias: true; colorManagement: true;"
       vr-mode-ui="enabled: false"
     >
-      <!-- Custom MenuVerse Pattern Marker -->
+      <!-- Custom MenuVerse Pattern Marker (ratio matches pattern border) -->
       <a-marker
         type="pattern"
         url="/logo.patt"
+        patternRatio="0.75"
         id="custom-marker"
         smooth="true"
         smoothCount="8"
@@ -77,7 +85,7 @@
         <a-entity id="custom-model" position="0 0.2 0" scale="1 1 1"></a-entity>
       </a-marker>
 
-      <!-- Standard Hiro Marker Fallback (Guarantees instant tracking on any device) -->
+      <!-- Standard Hiro Marker Fallback -->
       <a-marker
         preset="hiro"
         id="hiro-marker"
@@ -94,8 +102,45 @@
 
     <script>
       const loader = document.getElementById('ar-loader');
+      const pillText = document.getElementById('pill-text');
+      const resetBtn = document.getElementById('reset-btn');
       const urlParams = new URLSearchParams(window.location.search);
       const modelUrl = urlParams.get('modelUrl');
+
+      let isAnchored = false;
+      let activeModelEntity = null;
+
+      function lockAnchor(marker, entity) {
+        if (isAnchored) return;
+        isAnchored = true;
+
+        // Decompose world position & rotation of the marker at this moment
+        const worldPos = new THREE.Vector3();
+        const worldQuaternion = new THREE.Quaternion();
+        const worldScale = new THREE.Vector3();
+
+        marker.object3D.matrixWorld.decompose(worldPos, worldQuaternion, worldScale);
+
+        // Move the entity directly to the <a-scene> root so markerLost won't hide it!
+        const scene = document.querySelector('a-scene');
+        scene.object3D.add(entity.object3D);
+
+        // Set fixed world position and rotation
+        entity.object3D.position.copy(worldPos);
+        entity.object3D.quaternion.copy(worldQuaternion);
+        entity.object3D.visible = true;
+
+        activeModelEntity = entity;
+
+        // Update UI status pill
+        pillText.innerHTML = '✓ <span style="color:#10b981">Model Locked in 3D Space!</span>';
+        resetBtn.style.display = 'inline-block';
+      }
+
+      function resetAnchor() {
+        isAnchored = false;
+        location.reload();
+      }
 
       async function initAR() {
         if (!modelUrl) {
@@ -117,18 +162,19 @@
           }
 
           // Scale & Animation parameters
-          let scaleStr = '1.0 1.0 1.0';
+          let scaleStr = '1.5 1.5 1.5';
           let posStr = '0 0.3 0';
 
           if (modelUrl.toLowerCase().includes('burger')) {
-            scaleStr = '1.5 1.5 1.5';
+            scaleStr = '1.8 1.8 1.8';
             posStr = '0 0.4 0';
           } else if (modelUrl.toLowerCase().includes('pizza')) {
-            scaleStr = '0.2 0.2 0.2';
+            scaleStr = '0.25 0.25 0.25';
             posStr = '0 0.1 0';
           }
 
-          // Apply decompressed GLB model to both markers
+          const customMarker = document.getElementById('custom-marker');
+          const hiroMarker = document.getElementById('hiro-marker');
           const customModel = document.getElementById('custom-model');
           const hiroModel = document.getElementById('hiro-model');
 
@@ -139,15 +185,14 @@
             entity.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 12000; easing: linear');
           });
 
-          // Hide loader screen when model finishes loading in Three.js scene
-          customModel.addEventListener('model-loaded', () => {
-            loader.style.display = 'none';
-          });
-          hiroModel.addEventListener('model-loaded', () => {
-            loader.style.display = 'none';
-          });
+          // Attach Persistent Anchor Locking to both markers
+          customMarker.addEventListener('markerFound', () => lockAnchor(customMarker, customModel));
+          hiroMarker.addEventListener('markerFound', () => lockAnchor(hiroMarker, hiroModel));
 
-          // Safety fallback: hide loader after 6 seconds max
+          // Hide loader screen when model finishes loading
+          customModel.addEventListener('model-loaded', () => loader.style.display = 'none');
+          hiroModel.addEventListener('model-loaded', () => loader.style.display = 'none');
+
           setTimeout(() => {
             if (loader.style.display !== 'none') {
               loader.style.display = 'none';
