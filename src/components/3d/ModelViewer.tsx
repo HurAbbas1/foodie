@@ -28,6 +28,7 @@ interface ModelViewerProps {
 const ModelViewer = forwardRef<ModelViewerRef, ModelViewerProps>(
   ({ src, iosSrc, alt, autoRotate = true, poster }, ref) => {
     const [loadingModel, setLoadingModel] = useState(true);
+    const [processedSrc, setProcessedSrc] = useState(src);
     const viewerRef = useRef<any>(null);
 
     useImperativeHandle(ref, () => ({
@@ -38,11 +39,61 @@ const ModelViewer = forwardRef<ModelViewerRef, ModelViewerProps>(
       },
     }));
 
+    // Process source files (handle .gz client-side decompression)
+    useEffect(() => {
+      let active = true;
+      let objectUrl: string | null = null;
+
+      async function processSource() {
+        if (!src) return;
+
+        if (src.endsWith('.gz')) {
+          setLoadingModel(true);
+          try {
+            const response = await fetch(src);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            
+            // Native browser DecompressionStream support (Chrome 80+, Safari 16.4+, Firefox 113+)
+            if (typeof globalThis.DecompressionStream !== 'undefined') {
+              const ds = new DecompressionStream('gzip');
+              const decompressedStream = response.body!.pipeThrough(ds);
+              const blob = await new Response(decompressedStream).blob();
+              
+              if (active) {
+                objectUrl = URL.createObjectURL(blob);
+                setProcessedSrc(objectUrl);
+              }
+            } else {
+              // Fallback to uncompressed file if DecompressionStream is missing
+              const uncompressedUrl = src.substring(0, src.length - 3);
+              setProcessedSrc(uncompressedUrl);
+            }
+          } catch (error) {
+            console.error("Failed to decompress model file:", error);
+            // Fallback to uncompressed file on fetch/decode error
+            const uncompressedUrl = src.substring(0, src.length - 3);
+            setProcessedSrc(uncompressedUrl);
+          }
+        } else {
+          setProcessedSrc(src);
+        }
+      }
+
+      processSource();
+
+      return () => {
+        active = false;
+        if (objectUrl) {
+          URL.revokeObjectURL(objectUrl);
+        }
+      };
+    }, [src]);
+
     useEffect(() => {
       const viewer = viewerRef.current;
       if (!viewer) return;
 
-      // Reset loading state if the src changes
+      // Reset loading state if the source changes
       setLoadingModel(true);
 
       const handleLoad = () => {
@@ -50,7 +101,6 @@ const ModelViewer = forwardRef<ModelViewerRef, ModelViewerProps>(
       };
 
       const handleProgress = (event: any) => {
-        // event.detail.totalProgress ranges from 0 to 1
         if (event.detail.totalProgress === 1) {
           setLoadingModel(false);
         }
@@ -63,13 +113,13 @@ const ModelViewer = forwardRef<ModelViewerRef, ModelViewerProps>(
         viewer.removeEventListener('load', handleLoad);
         viewer.removeEventListener('progress', handleProgress);
       };
-    }, [src]); // Re-run if model source changes
+    }, [processedSrc]);
 
   return (
     <div className="relative w-full h-full min-h-[300px] md:min-h-[400px] bg-zinc-950/40 backdrop-blur-md rounded-2xl border border-zinc-800/80 overflow-hidden group">
       <model-viewer
         ref={viewerRef}
-        src={src}
+        src={processedSrc}
         ios-src={iosSrc || ''}
         alt={alt}
         poster={poster || ''}

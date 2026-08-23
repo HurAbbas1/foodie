@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
+import zlib from 'zlib';
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,7 +24,20 @@ export async function POST(req: NextRequest) {
     const filename = `${Date.now()}_${safeName}`;
     const filePath = path.join(uploadsDir, filename);
     
+    // Save original file
     await writeFile(filePath, buffer);
+    
+    // If it's a .glb file, also save a compressed .gz version
+    if (file.name.endsWith('.glb')) {
+      const compressedBuffer = zlib.gzipSync(buffer);
+      await writeFile(`${filePath}.gz`, compressedBuffer);
+      
+      // Return the compressed version path
+      return NextResponse.json({
+        success: true,
+        url: `/uploads/${filename}.gz`
+      });
+    }
     
     return NextResponse.json({
       success: true,
