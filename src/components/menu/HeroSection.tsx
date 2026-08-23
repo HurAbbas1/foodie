@@ -18,17 +18,19 @@ export default function HeroSection() {
           transition={{ duration: 0.6 }}
           className="flex justify-center mb-10 select-none"
         >
-          <div className="flex items-center justify-center max-w-[240px] sm:max-w-[280px] hover:scale-[1.02] transition-transform duration-300">
+          <div className="relative w-28 h-28 overflow-hidden flex items-center justify-center hover:scale-[1.02] transition-transform duration-300">
             <img 
               src="/logo-transparent.png" 
-              alt="MenuVerse Logo" 
-              className="w-full h-auto object-contain transition-all duration-300"
+              alt="MenuVerse Logo Icon" 
+              className="absolute left-0 top-0 h-full w-auto max-w-none object-cover"
               style={{
-                filter: 'brightness(3.2) contrast(1.15) drop-shadow(0 0 6px rgba(197, 155, 39, 0.6)) drop-shadow(0 0 16px rgba(245, 158, 11, 0.25))'
+                // Soft, natural gold-tinted drop shadow with standard natural colors
+                filter: 'brightness(1.05) drop-shadow(0 8px 16px rgba(197, 155, 39, 0.15))'
               }}
               onError={(e) => {
-                e.currentTarget.src = "/logo.jpg";
-                e.currentTarget.parentElement?.classList.add("bg-[#f5eedc]", "px-6", "py-3.5", "rounded-2xl", "border", "border-[#d9c3b0]/35");
+                e.currentTarget.src = "/logo-badge-transparent.png";
+                e.currentTarget.style.position = "static";
+                e.currentTarget.style.width = "100%";
               }}
             />
           </div>
