@@ -224,7 +224,7 @@ export default function ProductDetailModal({ dish, isOpen, onClose }: ProductDet
                     {dish.name}
                   </h2>
                   <div className="bg-amber-500/5 border border-amber-500/30 px-4 py-2 rounded-2xl shadow-inner">
-                    <span className="text-2xl font-black text-amber-500 tracking-tight">${dish.price.toFixed(2)}</span>
+                    <span className="text-2xl font-black text-amber-500 tracking-tight">Rs. {dish.price.toFixed(2)}</span>
                   </div>
                 </div>
 

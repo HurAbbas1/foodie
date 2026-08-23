@@ -114,7 +114,7 @@ export default function DishMobileView({ dish }: DishMobileViewProps) {
           <div className="flex justify-between items-start gap-4 mb-4">
             <h2 className="text-2xl font-black text-zinc-100">{dish.name}</h2>
             <span className="text-xl font-extrabold text-amber-500 shrink-0">
-              ${dish.price.toFixed(2)}
+              Rs. {dish.price.toFixed(2)}
             </span>
           </div>
 

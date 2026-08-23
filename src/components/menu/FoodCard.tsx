@@ -100,7 +100,7 @@ export default function FoodCard({ dish, onViewDetails }: FoodCardProps) {
               {dish.name}
             </h3>
             <span className="text-lg font-extrabold text-amber-500 shrink-0">
-              ${dish.price.toFixed(2)}
+              Rs. {dish.price.toFixed(2)}
             </span>
           </div>
 

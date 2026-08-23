@@ -342,7 +342,7 @@ export default function AdminDashboard() {
 
                     <div className="flex justify-between items-start gap-4 mb-2">
                       <h3 className="font-bold text-lg text-zinc-100 line-clamp-1">{dish.name}</h3>
-                      <span className="text-amber-500 font-extrabold">${dish.price.toFixed(2)}</span>
+                      <span className="text-amber-500 font-extrabold">Rs. {dish.price.toFixed(2)}</span>
                     </div>
 
                     <div className="flex gap-2 mb-3">
@@ -426,7 +426,7 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs uppercase font-extrabold text-zinc-400 tracking-wider mb-2">
-                  Price ($) *
+                  Price (PKR) *
                 </label>
                 <input
                   type="number"
