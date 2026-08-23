@@ -120,7 +120,7 @@ const ModelViewer = forwardRef<ModelViewerRef, ModelViewerProps>(
     }, [processedSrc]);
 
   return (
-    <div className="relative w-full h-full min-h-[300px] md:min-h-[400px] bg-zinc-950/40 backdrop-blur-md rounded-2xl border border-zinc-800/80 overflow-hidden group">
+    <div className="relative w-full h-[300px] md:h-[400px] bg-zinc-950/40 backdrop-blur-md rounded-2xl border border-zinc-800/80 overflow-hidden group">
       <model-viewer
         ref={viewerRef}
         src={processedSrc}
