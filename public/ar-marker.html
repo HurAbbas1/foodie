@@ -58,17 +58,11 @@
         border: 1px solid rgba(245, 158, 11, 0.4);
         color: #f4f4f5; padding: 10px 22px; border-radius: 99px;
         font-size: 13px; font-weight: 600; text-align: center;
-        z-index: 999; pointer-events: auto;
+        z-index: 999; pointer-events: none;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-        white-space: nowrap; display: flex; align-items: center; gap: 8px;
+        white-space: nowrap;
       }
       .ar-status-bar span { color: #f59e0b; font-weight: 700; }
-
-      .re-lock-btn {
-        background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.5);
-        color: #f59e0b; padding: 4px 10px; border-radius: 12px;
-        font-size: 11px; font-weight: 700; cursor: pointer; margin-left: 6px;
-      }
     </style>
   </head>
   <body>
@@ -77,19 +71,18 @@
     <div id="ar-loader">
       <div class="spinner"></div>
       <div class="loader-title">Opening Live AR Camera...</div>
-      <div class="loader-sub">Loading 3D model & preparing camera tracking</div>
+      <div class="loader-sub">Loading 3D model & preparing real-time tracking</div>
     </div>
 
     <!-- Live Status Pill -->
     <div class="ar-status-bar" id="status-pill">
       <span id="status-text">Point camera at the <span>MenuVerse Marker</span></span>
-      <button class="re-lock-btn" id="re-lock-btn" style="display:none" onclick="location.reload()">Reset Position</button>
     </div>
 
     <!-- AR.js Real-time Tracking Scene Over Live Webcam -->
     <a-scene
       embedded
-      arjs="sourceType: webcam; debugUIEnabled: false; trackingMethod: best; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+      arjs="sourceType: webcam; debugUIEnabled: false; trackingMethod: best; detectionMode: mono;"
       renderer="logarithmicDepthBuffer: true; antialias: true; colorManagement: true;"
       vr-mode-ui="enabled: false"
     >
@@ -97,7 +90,7 @@
       <a-entity light="type: ambient; color: #ffffff; intensity: 1.8;"></a-entity>
       <a-entity light="type: directional; color: #ffffff; intensity: 1.4;" position="-1 4 2"></a-entity>
 
-      <!-- Custom MenuVerse Pattern Marker -->
+      <!-- Custom MenuVerse Pattern Marker (Follows marker dynamically) -->
       <a-marker
         type="pattern"
         url="/logo.patt"
@@ -112,7 +105,7 @@
         <a-entity id="custom-model" position="0 0.2 0" scale="0.8 0.8 0.8"></a-entity>
       </a-marker>
 
-      <!-- Standard Hiro Marker Fallback -->
+      <!-- Standard Hiro Marker Fallback (Follows marker dynamically) -->
       <a-marker
         preset="hiro"
         id="hiro-marker"
@@ -131,23 +124,8 @@
     <script>
       const loader = document.getElementById('ar-loader');
       const statusText = document.getElementById('status-text');
-      const reLockBtn = document.getElementById('reset-btn');
       const urlParams = new URLSearchParams(window.location.search);
       const modelUrl = urlParams.get('modelUrl');
-
-      // Make marker persistent: once detected, keep model visible even if marker leaves camera view
-      function makeMarkerPersistent(marker) {
-        marker.addEventListener('markerFound', () => {
-          marker.object3D.visible = true;
-          statusText.innerHTML = '✓ <span style="color:#10b981">Model Fixed on Marker!</span>';
-          if (reLockBtn) reLockBtn.style.display = 'inline-block';
-        });
-
-        marker.addEventListener('markerLost', () => {
-          // Force marker to remain visible at its last known position
-          marker.object3D.visible = true;
-        });
-      }
 
       async function initAR() {
         if (!modelUrl) {
@@ -192,9 +170,16 @@
             entity.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 12000; easing: linear');
           });
 
-          // Enable persistent visibility on both markers
-          makeMarkerPersistent(customMarker);
-          makeMarkerPersistent(hiroMarker);
+          // Dynamic marker tracking status feedback
+          [customMarker, hiroMarker].forEach(marker => {
+            marker.addEventListener('markerFound', () => {
+              statusText.innerHTML = '✓ <span style="color:#10b981">Tracking Marker Live!</span>';
+            });
+
+            marker.addEventListener('markerLost', () => {
+              statusText.innerHTML = 'Point camera at the <span>MenuVerse Marker</span>';
+            });
+          });
 
           // Hide loader when model finishes parsing in Three.js
           customModel.addEventListener('model-loaded', () => loader.style.display = 'none');
