@@ -11,18 +11,22 @@ export default function HeroSection() {
       <div className="absolute bottom-1/4 right-1/10 w-96 h-96 rounded-full bg-rose-500/5 blur-[120px] pointer-events-none"></div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-        {/* Full Brand Logo Banner */}
+        {/* Full Brand Logo Banner (Clean transparent png logo overlay) */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="flex justify-center mb-8"
+          className="flex justify-center mb-10 select-none"
         >
-          <div className="bg-[#f5eedc] px-6 py-3.5 rounded-2xl shadow-[0_10px_25px_rgba(0,0,0,0.25)] border border-[#d9c3b0]/35 flex items-center justify-center max-w-[260px] sm:max-w-[300px] hover:scale-[1.02] transition-transform duration-300">
+          <div className="flex items-center justify-center max-w-[240px] sm:max-w-[280px] hover:scale-[1.02] transition-transform duration-300">
             <img 
-              src="/logo.jpg" 
+              src="/logo-transparent.png" 
               alt="MenuVerse Logo" 
-              className="w-full h-auto object-contain"
+              className="w-full h-auto object-contain brightness-110 drop-shadow-[0_4px_20px_rgba(255,255,255,0.05)]"
+              onError={(e) => {
+                e.currentTarget.src = "/logo.jpg";
+                e.currentTarget.parentElement?.classList.add("bg-[#f5eedc]", "px-6", "py-3.5", "rounded-2xl", "border", "border-[#d9c3b0]/35");
+              }}
             />
           </div>
         </motion.div>

@@ -4,7 +4,7 @@ import path from 'path';
 
 export async function POST(request: Request) {
   try {
-    const { pattString, markerBase64, transparentLogoBase64 } = await request.json();
+    const { pattString, markerBase64, transparentLogoBase64, transparentFullLogoBase64 } = await request.json();
 
     if (!pattString || !markerBase64) {
       return NextResponse.json({ error: 'Missing data' }, { status: 400 });
@@ -23,6 +23,12 @@ export async function POST(request: Request) {
     if (transparentLogoBase64) {
       const base64LogoData = transparentLogoBase64.replace(/^data:image\/png;base64,/, "");
       fs.writeFileSync(path.join(publicDir, 'logo-badge-transparent.png'), Buffer.from(base64LogoData, 'base64'));
+    }
+
+    // 4. Save logo-transparent.png (decode base64) if present
+    if (transparentFullLogoBase64) {
+      const base64FullLogoData = transparentFullLogoBase64.replace(/^data:image\/png;base64,/, "");
+      fs.writeFileSync(path.join(publicDir, 'logo-transparent.png'), Buffer.from(base64FullLogoData, 'base64'));
     }
 
     return NextResponse.json({ success: true });

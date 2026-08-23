@@ -123,6 +123,9 @@
         drawMarker(logo);
       };
 
+      const fullLogo = new Image();
+      fullLogo.src = '/logo.jpg';
+
       btn.addEventListener('click', () => {
         statusDiv.innerText = "Encoding pattern...";
 
@@ -146,6 +149,9 @@
           
           // Generate transparent background version of the badge logo
           const transparentLogoBase64 = makeLogoTransparent(logo);
+          
+          // Generate transparent background version of the full logo
+          const transparentFullLogoBase64 = makeLogoTransparent(fullLogo);
 
           // Send to Next.js API to save locally
           fetch('/api/save-marker', {
@@ -154,13 +160,14 @@
             body: JSON.stringify({
               pattString: patternFileString,
               markerBase64: markerBase64,
-              transparentLogoBase64: transparentLogoBase64
+              transparentLogoBase64: transparentLogoBase64,
+              transparentFullLogoBase64: transparentFullLogoBase64
             })
           })
           .then(res => res.json())
           .then(data => {
             if (data.success) {
-              statusDiv.innerText = "Success! Generated 'logo.patt', 'logo-marker.png', and transparent 'logo-badge-transparent.png' in your public/ directory.";
+              statusDiv.innerText = "Success! Generated pattern files, transparent badge, and transparent 'logo-transparent.png' in your public/ directory.";
             } else {
               statusDiv.innerText = "Error: " + data.error;
             }
