@@ -71,7 +71,7 @@
     <div id="ar-loader">
       <div class="spinner"></div>
       <div class="loader-title">Opening Live AR Camera...</div>
-      <div class="loader-sub">Loading 3D model & calculating 2x QR scale</div>
+      <div class="loader-sub">Loading 3D model & calculating 4x QR scale</div>
     </div>
 
     <!-- Live Status Pill -->
@@ -167,8 +167,8 @@
         isDragging = false;
       });
 
-      // Three.js Bounding Box Normalization (guarantees exact 2x QR marker size)
-      function setupProportionalMesh(entity, targetMultiplier = 2.0) {
+      // Three.js Bounding Box Normalization (guarantees exact 4x QR marker size)
+      function setupProportionalMesh(entity, targetMultiplier = 4.0) {
         entity.addEventListener('model-loaded', () => {
           const mesh = entity.getObject3D('mesh');
           if (mesh) {
@@ -186,7 +186,7 @@
             // Align bottom base flush on the marker plane (Y = 0)
             mesh.position.y += size.y / 2;
 
-            // Scale mesh so its largest dimension is EXACTLY targetMultiplier (2.0 = 2x QR marker size)
+            // Scale mesh so its largest dimension is EXACTLY targetMultiplier (4.0 = 4x QR marker size)
             const scaleFactor = (1.0 / maxDim) * targetMultiplier;
             entity.setAttribute('scale', `${scaleFactor} ${scaleFactor} ${scaleFactor}`);
           }
@@ -213,10 +213,10 @@
             finalUrl = URL.createObjectURL(blob) + '#.glb';
           }
 
-          // Target scale: 2.0 = EXACTLY 2x the physical QR marker size
-          let targetScale = 2.0;
+          // Target scale: 4.0 = EXACTLY 4x the physical QR marker size
+          let targetScale = 4.0;
           if (modelUrl.toLowerCase().includes('pizza')) {
-            targetScale = 2.2;
+            targetScale = 4.4;
           }
 
           const customMarker = document.getElementById('custom-marker');
@@ -233,7 +233,7 @@
           // Dynamic marker tracking status feedback
           [customMarker, hiroMarker].forEach(marker => {
             marker.addEventListener('markerFound', () => {
-              statusText.innerHTML = '✓ <span style="color:#10b981">Tracking Live (2x Size)! Drag to tilt</span>';
+              statusText.innerHTML = '✓ <span style="color:#10b981">Tracking Live (4x Size)! Drag to tilt</span>';
             });
 
             marker.addEventListener('markerLost', () => {
