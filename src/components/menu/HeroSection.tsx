@@ -24,7 +24,7 @@ export default function HeroSection() {
               alt="MenuVerse Logo" 
               className="w-full h-auto object-contain transition-all duration-300"
               style={{
-                filter: 'brightness(1.6) contrast(1.1) drop-shadow(0 0 2px rgba(245, 238, 220, 0.9)) drop-shadow(0 0 10px rgba(197, 155, 39, 0.7)) drop-shadow(0 0 20px rgba(245, 158, 11, 0.4))'
+                filter: 'brightness(3.2) contrast(1.15) drop-shadow(0 0 6px rgba(197, 155, 39, 0.6)) drop-shadow(0 0 16px rgba(245, 158, 11, 0.25))'
               }}
               onError={(e) => {
                 e.currentTarget.src = "/logo.jpg";
