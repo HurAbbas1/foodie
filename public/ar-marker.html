@@ -9,7 +9,7 @@
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background: #000; font-family: system-ui, -apple-system, sans-serif; }
+      html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background: #000; font-family: system-ui, -apple-system, sans-serif; touch-action: none; }
 
       /* Force AR.js Video and Canvas to fill 100% of viewport without black bars */
       .arjs-video, video {
@@ -102,7 +102,7 @@
         smoothTolerance="0.01"
         smoothThreshold="2"
       >
-        <a-entity id="custom-model" position="0 0.2 0" scale="0.8 0.8 0.8"></a-entity>
+        <a-entity id="custom-model" position="0 0.3 0" scale="2.0 2.0 2.0"></a-entity>
       </a-marker>
 
       <!-- Standard Hiro Marker Fallback (Follows marker dynamically) -->
@@ -115,7 +115,7 @@
         smoothTolerance="0.01"
         smoothThreshold="2"
       >
-        <a-entity id="hiro-model" position="0 0.2 0" scale="0.8 0.8 0.8"></a-entity>
+        <a-entity id="hiro-model" position="0 0.3 0" scale="2.0 2.0 2.0"></a-entity>
       </a-marker>
 
       <a-entity camera></a-entity>
@@ -126,6 +126,39 @@
       const statusText = document.getElementById('status-text');
       const urlParams = new URLSearchParams(window.location.search);
       const modelUrl = urlParams.get('modelUrl');
+
+      let customModelEntity = null;
+      let hiroModelEntity = null;
+      let isDragging = false;
+      let previousTouchX = 0;
+      let currentRotationY = 0;
+
+      // Enable touch drag left-to-right rotation control
+      window.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+          isDragging = true;
+          previousTouchX = e.touches[0].clientX;
+        }
+      });
+
+      window.addEventListener('touchmove', (e) => {
+        if (isDragging && e.touches.length === 1) {
+          const deltaX = e.touches[0].clientX - previousTouchX;
+          previousTouchX = e.touches[0].clientX;
+          currentRotationY += deltaX * 0.8;
+
+          [customModelEntity, hiroModelEntity].forEach(entity => {
+            if (entity) {
+              entity.removeAttribute('animation');
+              entity.setAttribute('rotation', `0 ${currentRotationY} 0`);
+            }
+          });
+        }
+      });
+
+      window.addEventListener('touchend', () => {
+        isDragging = false;
+      });
 
       async function initAR() {
         if (!modelUrl) {
@@ -146,24 +179,24 @@
             finalUrl = URL.createObjectURL(blob) + '#.glb';
           }
 
-          // Scale & Position parameters
-          let scaleStr = '0.8 0.8 0.8';
-          let posStr = '0 0.2 0';
+          // 2x Scaled parameters
+          let scaleStr = '1.6 1.6 1.6';
+          let posStr = '0 0.3 0';
 
           if (modelUrl.toLowerCase().includes('burger')) {
-            scaleStr = '1.0 1.0 1.0';
-            posStr = '0 0.3 0';
+            scaleStr = '2.0 2.0 2.0';
+            posStr = '0 0.4 0';
           } else if (modelUrl.toLowerCase().includes('pizza')) {
-            scaleStr = '0.15 0.15 0.15';
-            posStr = '0 0.1 0';
+            scaleStr = '0.35 0.35 0.35';
+            posStr = '0 0.2 0';
           }
 
           const customMarker = document.getElementById('custom-marker');
           const hiroMarker = document.getElementById('hiro-marker');
-          const customModel = document.getElementById('custom-model');
-          const hiroModel = document.getElementById('hiro-model');
+          customModelEntity = document.getElementById('custom-model');
+          hiroModelEntity = document.getElementById('hiro-model');
 
-          [customModel, hiroModel].forEach(entity => {
+          [customModelEntity, hiroModelEntity].forEach(entity => {
             entity.setAttribute('gltf-model', finalUrl);
             entity.setAttribute('scale', scaleStr);
             entity.setAttribute('position', posStr);
@@ -173,7 +206,7 @@
           // Dynamic marker tracking status feedback
           [customMarker, hiroMarker].forEach(marker => {
             marker.addEventListener('markerFound', () => {
-              statusText.innerHTML = '✓ <span style="color:#10b981">Tracking Marker Live!</span>';
+              statusText.innerHTML = '✓ <span style="color:#10b981">Tracking Live! Drag finger to rotate</span>';
             });
 
             marker.addEventListener('markerLost', () => {
@@ -182,8 +215,8 @@
           });
 
           // Hide loader when model finishes parsing in Three.js
-          customModel.addEventListener('model-loaded', () => loader.style.display = 'none');
-          hiroModel.addEventListener('model-loaded', () => loader.style.display = 'none');
+          customModelEntity.addEventListener('model-loaded', () => loader.style.display = 'none');
+          hiroModelEntity.addEventListener('model-loaded', () => loader.style.display = 'none');
 
           setTimeout(() => {
             if (loader.style.display !== 'none') {
