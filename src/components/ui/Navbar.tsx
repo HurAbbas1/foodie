@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ChefHat, LayoutDashboard, UtensilsCrossed } from 'lucide-react';
+import { ChefHat, UtensilsCrossed } from 'lucide-react';
 
 export default function Navbar() {
   return (
@@ -33,14 +33,6 @@ export default function Navbar() {
             >
               <UtensilsCrossed size={16} />
               <span>Browse Menu</span>
-            </Link>
-            
-            <Link 
-              href="/admin" 
-              className="bg-zinc-900 border border-zinc-800 hover:border-amber-500/40 hover:bg-zinc-800 text-zinc-200 hover:text-amber-400 text-xs sm:text-sm font-semibold py-2 px-3.5 sm:px-4 rounded-xl flex items-center gap-2 transition-all shadow-inner"
-            >
-              <LayoutDashboard size={15} />
-              <span>Admin Panel</span>
             </Link>
           </div>
         </div>
