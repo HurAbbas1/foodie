@@ -23,10 +23,11 @@ interface ModelViewerProps {
   alt: string;
   autoRotate?: boolean;
   poster?: string;
+  scale?: string;
 }
 
 const ModelViewer = forwardRef<ModelViewerRef, ModelViewerProps>(
-  ({ src, iosSrc, alt, autoRotate = true, poster }, ref) => {
+  ({ src, iosSrc, alt, autoRotate = true, poster, scale }, ref) => {
     const [loadingModel, setLoadingModel] = useState(true);
     const [processedSrc, setProcessedSrc] = useState(src.endsWith('.gz') ? '' : src);
     const viewerRef = useRef<any>(null);
@@ -127,6 +128,7 @@ const ModelViewer = forwardRef<ModelViewerRef, ModelViewerProps>(
         ios-src={iosSrc || ''}
         alt={alt}
         poster={poster || ''}
+        scale={scale || undefined}
         loading="eager"
         reveal="auto"
         ar

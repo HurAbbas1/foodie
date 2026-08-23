@@ -39,6 +39,13 @@ interface Dish {
   allergens: Allergen[];
 }
 
+const getDishScale = (name: string): string => {
+  const lowercase = name.toLowerCase();
+  if (lowercase.includes('burger')) return '0.17 0.17 0.17';
+  if (lowercase.includes('pizza')) return '0.22 0.22 0.22';
+  return '0.17 0.17 0.17';
+};
+
 interface ProductDetailModalProps {
   dish: Dish | null;
   isOpen: boolean;
@@ -122,6 +129,7 @@ export default function ProductDetailModal({ dish, isOpen, onClose }: ProductDet
                     alt={dish.name}
                     autoRotate={autoRotate}
                     poster={dish.previewUrl || undefined}
+                    scale={getDishScale(dish.name)}
                   />
                 ) : dish.modelUrl ? (
                   <div className="w-full h-[300px] md:h-full relative rounded-2xl overflow-hidden border border-zinc-800/80 bg-zinc-950/60 flex items-center justify-center">

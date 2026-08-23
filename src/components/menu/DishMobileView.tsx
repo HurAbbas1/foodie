@@ -37,6 +37,13 @@ interface Dish {
   allergens: Allergen[];
 }
 
+const getDishScale = (name: string): string => {
+  const lowercase = name.toLowerCase();
+  if (lowercase.includes('burger')) return '0.17 0.17 0.17';
+  if (lowercase.includes('pizza')) return '0.22 0.22 0.22';
+  return '0.17 0.17 0.17';
+};
+
 interface DishMobileViewProps {
   dish: Dish;
 }
@@ -85,6 +92,7 @@ export default function DishMobileView({ dish }: DishMobileViewProps) {
             alt={dish.name}
             autoRotate={true}
             poster={dish.previewUrl || undefined}
+            scale={getDishScale(dish.name)}
           />
         ) : (
           <div className="w-full h-full bg-zinc-900/40 rounded-2xl border border-zinc-850 flex flex-col items-center justify-center text-zinc-500">
