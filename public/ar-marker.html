@@ -2,279 +2,165 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MenuVerse AR Scanner</title>
-    <!-- jsQR for instant QR code detection -->
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
-    <!-- Google model-viewer for high performance 3D & WebXR AR -->
-    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+    <title>MenuVerse Real-Time AR Marker</title>
+    <!-- A-Frame 1.3.0 -->
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <!-- AR.js for real-time camera marker tracking -->
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { background: #09090b; overflow: hidden; width: 100vw; height: 100vh; font-family: system-ui, -apple-system, sans-serif; color: #f4f4f5; }
+      body { background: #000; overflow: hidden; width: 100vw; height: 100vh; font-family: system-ui, -apple-system, sans-serif; }
 
-      /* Camera video */
-      #camera-video {
-        position: fixed; top: 0; left: 0;
-        width: 100%; height: 100%;
-        object-fit: cover; z-index: 1;
-      }
-      #qr-canvas { display: none; }
-
-      /* Scanning overlay */
-      #scan-overlay {
-        position: fixed; inset: 0; z-index: 10;
-        display: flex; flex-direction: column;
-        align-items: center; justify-content: center;
-        pointer-events: none;
-      }
-      .scan-frame {
-        width: min(260px, 65vw); height: min(260px, 65vw);
-        position: relative;
-      }
-      .corner {
-        position: absolute; width: 28px; height: 28px;
-        border-color: #f59e0b; border-style: solid;
-        transition: border-color 0.3s ease;
-      }
-      .corner.tl { top: 0; left: 0; border-width: 3px 0 0 3px; border-radius: 6px 0 0 0; }
-      .corner.tr { top: 0; right: 0; border-width: 3px 3px 0 0; border-radius: 0 6px 0 0; }
-      .corner.bl { bottom: 0; left: 0; border-width: 0 0 3px 3px; border-radius: 0 0 0 6px; }
-      .corner.br { bottom: 0; right: 0; border-width: 0 3px 3px 0; border-radius: 0 0 6px 0; }
-
-      .scan-line {
-        position: absolute; left: 4px; right: 4px; height: 2px;
-        background: linear-gradient(90deg, transparent, #f59e0b, transparent);
-        animation: scan 2s linear infinite;
-        border-radius: 1px;
-        box-shadow: 0 0 8px #f59e0b;
-      }
-      @keyframes scan { 0% { top: 4px; } 100% { top: calc(100% - 6px); } }
-
-      .scan-hint {
-        margin-top: 24px;
-        color: rgba(255,255,255,0.85);
-        font-size: 13px; font-weight: 500;
-        text-align: center;
-        text-shadow: 0 2px 8px rgba(0,0,0,0.8);
-      }
-      .scan-hint span { color: #f59e0b; font-weight: 700; }
-
-      /* Found Badge */
-      #found-badge {
-        display: none;
-        position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
-        background: #10b981; color: #fff;
-        font-size: 13px; font-weight: 700;
-        padding: 10px 24px; border-radius: 99px;
-        z-index: 100; box-shadow: 0 4px 20px rgba(16,185,129,0.4);
-      }
-
-      /* 3D Model Display Container (shown after QR scan) */
-      #model-container {
-        display: none;
-        position: fixed; inset: 0; z-index: 50;
-        background: #09090b;
-        flex-direction: column;
-        align-items: center; justify-content: space-between;
-        padding: 24px 16px;
-      }
-
-      model-viewer {
-        width: 100%; height: 75vh;
-        outline: none; display: block;
-      }
-
-      /* AR Launch Button */
-      .ar-launch-btn {
-        background: linear-gradient(135deg, #f59e0b, #d97706);
-        color: #09090b; font-weight: 900;
-        font-size: 14px; text-transform: uppercase;
-        letter-spacing: 0.05em;
-        padding: 14px 32px; border-radius: 16px;
-        border: none; cursor: pointer;
-        box-shadow: 0 0 25px rgba(245,158,11,0.4);
-        display: flex; items-center; gap: 8px;
-        transition: transform 0.2s ease;
-      }
-      .ar-launch-btn:active { transform: scale(0.95); }
-
-      /* Camera Loader */
-      #loader {
-        position: fixed; inset: 0; z-index: 200;
+      /* Loading Screen */
+      #ar-loader {
+        position: fixed; inset: 0; z-index: 9999;
         background: #09090b;
         display: flex; flex-direction: column;
         align-items: center; justify-content: center;
-        gap: 16px; color: #a1a1aa; font-size: 13px; font-weight: 600;
+        gap: 16px; color: #f4f4f5; text-align: center; padding: 24px;
       }
       .spinner {
         border: 3px solid #27272a; border-top: 3px solid #f59e0b;
-        border-radius: 50%; width: 36px; height: 36px;
+        border-radius: 50%; width: 38px; height: 38px;
         animation: spin 1s linear infinite;
       }
       @keyframes spin { to { transform: rotate(360deg); } }
+      .loader-title { font-size: 15px; font-weight: 700; color: #f59e0b; letter-spacing: 0.05em; }
+      .loader-sub { font-size: 13px; color: #a1a1aa; max-w: 260px; line-height: 1.4; }
+
+      /* Real-time AR Instruction Pill */
+      .ar-instruction-pill {
+        position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+        background: rgba(9, 9, 11, 0.85);
+        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        color: #f4f4f5; padding: 10px 22px; border-radius: 99px;
+        font-size: 13px; font-weight: 600; text-align: center;
+        z-index: 999; pointer-events: none;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+        white-space: nowrap;
+      }
+      .ar-instruction-pill span { color: #f59e0b; font-weight: 700; }
     </style>
   </head>
   <body>
 
-    <!-- Loader -->
-    <div id="loader">
+    <!-- Loading Screen -->
+    <div id="ar-loader">
       <div class="spinner"></div>
-      <div>Starting Camera...</div>
+      <div class="loader-title">Preparing 3D AR Experience...</div>
+      <div class="loader-sub">Decompressing model & initializing camera tracking</div>
     </div>
 
-    <!-- QR Badge -->
-    <div id="found-badge">✓ MenuVerse QR Verified!</div>
-
-    <!-- Camera Feed -->
-    <video id="camera-video" autoplay muted playsinline></video>
-    <canvas id="qr-canvas"></canvas>
-
-    <!-- Scan UI -->
-    <div id="scan-overlay">
-      <div class="scan-frame">
-        <div class="corner tl"></div>
-        <div class="corner tr"></div>
-        <div class="corner bl"></div>
-        <div class="corner br"></div>
-        <div class="scan-line"></div>
-      </div>
-      <div class="scan-hint">Point at the <span>MenuVerse QR</span> marker</div>
+    <!-- Live AR Overlay Guide -->
+    <div class="ar-instruction-pill">
+      Point camera at the <span>MenuVerse Marker</span>
     </div>
 
-    <!-- 3D Model View Container (shows model after QR is scanned) -->
-    <div id="model-container">
-      <model-viewer
-        id="viewer"
-        camera-controls
-        auto-rotate
-        shadow-intensity="1.5"
-        exposure="1.2"
-        loading="eager"
-        ar
-        ar-modes="webxr scene-viewer quick-look"
-        ar-scale="auto"
+    <!-- AR.js Real-time Tracking Scene -->
+    <a-scene
+      embedded
+      arjs="sourceType: webcam; debugUIEnabled: false; trackingMethod: best; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+      renderer="logarithmicDepthBuffer: true; antialias: true; colorManagement: true;"
+      vr-mode-ui="enabled: false"
+    >
+      <!-- Custom MenuVerse Pattern Marker -->
+      <a-marker
+        type="pattern"
+        url="/logo.patt"
+        id="custom-marker"
+        smooth="true"
+        smoothCount="8"
+        smoothTolerance="0.01"
+        smoothThreshold="3"
       >
-      </model-viewer>
-      <button class="ar-launch-btn" onclick="document.getElementById('viewer').activateAR()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-        View in AR Space
-      </button>
-    </div>
+        <a-entity id="custom-model" position="0 0.2 0" scale="1 1 1"></a-entity>
+      </a-marker>
+
+      <!-- Standard Hiro Marker Fallback (Guarantees instant tracking on any device) -->
+      <a-marker
+        preset="hiro"
+        id="hiro-marker"
+        smooth="true"
+        smoothCount="8"
+        smoothTolerance="0.01"
+        smoothThreshold="3"
+      >
+        <a-entity id="hiro-model" position="0 0.2 0" scale="1 1 1"></a-entity>
+      </a-marker>
+
+      <a-entity camera></a-entity>
+    </a-scene>
 
     <script>
-      const video = document.getElementById('camera-video');
-      const canvas = document.getElementById('qr-canvas');
-      const ctx = canvas.getContext('2d');
-      const loader = document.getElementById('loader');
-      const foundBadge = document.getElementById('found-badge');
-      const scanOverlay = document.getElementById('scan-overlay');
-      const modelContainer = document.getElementById('model-container');
-      const viewer = document.getElementById('viewer');
-
+      const loader = document.getElementById('ar-loader');
       const urlParams = new URLSearchParams(window.location.search);
-      let rawModelUrl = urlParams.get('modelUrl');
+      const modelUrl = urlParams.get('modelUrl');
 
-      let cameraStream = null;
-      let qrDetected = false;
+      async function initAR() {
+        if (!modelUrl) {
+          loader.innerHTML = '<div style="color:#ef4444;font-weight:700;">Error: No model URL provided</div>';
+          return;
+        }
 
-      // ── 1. Start Camera Feed for Scanning ────────────────────────────────
-      async function startCamera() {
         try {
-          cameraStream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
-            audio: false
+          let finalModelUrl = modelUrl;
+
+          // Decompress .gz binary into Object URL if needed
+          if (modelUrl.endsWith('.gz')) {
+            const response = await fetch(modelUrl);
+            const decompressedStream = response.body.pipeThrough(new DecompressionStream('gzip'));
+            const blob = await new Response(decompressedStream, {
+              headers: { 'Content-Type': 'model/gltf-binary' }
+            }).blob();
+            finalModelUrl = URL.createObjectURL(blob) + '#.glb';
+          }
+
+          // Scale & Animation parameters
+          let scaleStr = '1.0 1.0 1.0';
+          let posStr = '0 0.3 0';
+
+          if (modelUrl.toLowerCase().includes('burger')) {
+            scaleStr = '1.5 1.5 1.5';
+            posStr = '0 0.4 0';
+          } else if (modelUrl.toLowerCase().includes('pizza')) {
+            scaleStr = '0.2 0.2 0.2';
+            posStr = '0 0.1 0';
+          }
+
+          // Apply decompressed GLB model to both markers
+          const customModel = document.getElementById('custom-model');
+          const hiroModel = document.getElementById('hiro-model');
+
+          [customModel, hiroModel].forEach(entity => {
+            entity.setAttribute('gltf-model', finalModelUrl);
+            entity.setAttribute('scale', scaleStr);
+            entity.setAttribute('position', posStr);
+            entity.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 12000; easing: linear');
           });
-          video.srcObject = cameraStream;
-          video.onloadedmetadata = () => {
-            video.play();
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+
+          // Hide loader screen when model finishes loading in Three.js scene
+          customModel.addEventListener('model-loaded', () => {
             loader.style.display = 'none';
-            requestAnimationFrame(scanLoop);
-          };
-        } catch (err) {
-          loader.innerHTML = '<div style="color:#ef4444;padding:24px;text-align:center;">Camera access required.<br>Please allow camera permission in your browser.</div>';
-        }
-      }
-
-      // ── 2. Scan Frame Loop ────────────────────────────────────────────────
-      function scanLoop() {
-        if (qrDetected) return;
-        if (video.readyState === video.HAVE_ENOUGH_DATA) {
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const code = jsQR(imageData.data, imageData.width, imageData.height, {
-            inversionAttempts: 'dontInvert'
+          });
+          hiroModel.addEventListener('model-loaded', () => {
+            loader.style.display = 'none';
           });
 
-          if (code) {
-            onQRDetected();
-            return;
-          }
+          // Safety fallback: hide loader after 6 seconds max
+          setTimeout(() => {
+            if (loader.style.display !== 'none') {
+              loader.style.display = 'none';
+            }
+          }, 6000);
+
+        } catch (err) {
+          console.error('AR initialization error:', err);
+          loader.innerHTML = '<div style="color:#ef4444;font-weight:700;">Failed to load 3D model</div>';
         }
-        requestAnimationFrame(scanLoop);
       }
 
-      // ── 3. Handle Successful QR Scan ─────────────────────────────────────
-      async function onQRDetected() {
-        qrDetected = true;
-
-        // UI Feedback: Flash scanner corners green
-        document.querySelectorAll('.corner').forEach(c => c.style.borderColor = '#10b981');
-        foundBadge.style.display = 'block';
-
-        // CRITICAL FIX: Stop all camera stream tracks before switching to 3D/AR mode
-        // This releases the camera lock so WebXR/SceneViewer can use the camera cleanly without going black!
-        if (cameraStream) {
-          cameraStream.getTracks().forEach(track => track.stop());
-        }
-
-        setTimeout(async () => {
-          video.style.display = 'none';
-          scanOverlay.style.display = 'none';
-          foundBadge.style.display = 'none';
-          modelContainer.style.display = 'flex';
-
-          // Process Model URL (handle .gz decompression stream if needed)
-          if (rawModelUrl) {
-            let finalSrc = rawModelUrl;
-
-            if (rawModelUrl.endsWith('.gz')) {
-              try {
-                const response = await fetch(rawModelUrl);
-                const decompressedStream = response.body.pipeThrough(new DecompressionStream('gzip'));
-                const blob = await new Response(decompressedStream, {
-                  headers: { 'Content-Type': 'model/gltf-binary' }
-                }).blob();
-                finalSrc = URL.createObjectURL(blob) + '#.glb';
-              } catch (e) {
-                console.error('Decompression failed, falling back to raw URL:', e);
-              }
-            }
-
-            viewer.src = finalSrc;
-
-            // Apply scale configuration
-            if (rawModelUrl.toLowerCase().includes('burger')) {
-              viewer.scale = '0.17 0.17 0.17';
-            } else if (rawModelUrl.toLowerCase().includes('pizza')) {
-              viewer.scale = '0.22 0.22 0.22';
-            } else {
-              viewer.scale = '0.17 0.17 0.17';
-            }
-
-            // Auto-trigger AR mode if WebXR is supported
-            setTimeout(() => {
-              try {
-                viewer.activateAR();
-              } catch (e) {
-                console.log('AR auto-launch prompt ready:', e);
-              }
-            }, 800);
-          }
-        }, 500);
-      }
-
-      startCamera();
+      initAR();
     </script>
   </body>
 </html>
