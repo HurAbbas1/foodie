@@ -203,81 +203,84 @@ export default function ProductDetailModal({ dish, isOpen, onClose }: ProductDet
               )}
             </div>
 
-            {/* Right Side: Dish Details & Ingredients Table */}
-            <div className="w-full md:w-1/2 p-6 md:p-8 overflow-y-auto flex flex-col justify-between">
+            {/* Right Side: Dish Details & Advanced Ingredients Dashboard */}
+            <div className="w-full md:w-1/2 p-6 md:p-8 overflow-y-auto flex flex-col justify-between max-h-[50vh] md:max-h-none">
               <div>
                 {/* Header Information */}
-                <div className="flex flex-wrap items-center gap-3 mb-2.5">
-                  <span className="bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[10px] uppercase tracking-widest font-extrabold px-3 py-1 rounded-full">
+                <div className="flex flex-wrap items-center gap-2.5 mb-4">
+                  <span className="bg-amber-500/10 border border-amber-500/35 text-amber-500 text-[10px] uppercase tracking-widest font-black px-3.5 py-1.5 rounded-xl shadow-inner">
                     {dish.category}
                   </span>
                   {dish.calories && (
-                    <span className="bg-zinc-800/80 border border-zinc-700/60 text-zinc-300 text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1">
+                    <span className="bg-zinc-900/80 border border-zinc-800 text-zinc-300 text-[10px] font-bold px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 shadow-md">
                       <Flame size={12} className="text-orange-500 fill-orange-500" />
                       <span>{dish.calories} Calories</span>
                     </span>
                   )}
                 </div>
 
-                <div className="flex justify-between items-start gap-4 mb-4">
-                  <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-6 border-b border-zinc-900">
+                  <h2 className="text-3xl sm:text-4xl font-black tracking-tight bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">
                     {dish.name}
                   </h2>
-                  <span className="text-2xl font-black text-amber-500">${dish.price.toFixed(2)}</span>
+                  <div className="bg-amber-500/5 border border-amber-500/30 px-4 py-2 rounded-2xl shadow-inner">
+                    <span className="text-2xl font-black text-amber-500 tracking-tight">${dish.price.toFixed(2)}</span>
+                  </div>
                 </div>
 
                 {/* Description */}
-                <p className="text-sm sm:text-base text-zinc-400 font-normal leading-relaxed mb-6 border-b border-zinc-900 pb-5">
+                <p className="text-sm text-zinc-400 font-normal leading-relaxed mb-8">
                   {dish.description}
                 </p>
 
-                {/* Allergens Checklist */}
+                {/* Allergens warning */}
                 {dish.allergens.length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="text-xs uppercase font-extrabold tracking-widest text-zinc-400 mb-3 flex items-center gap-1.5">
+                  <div className="mb-8">
+                    <h3 className="text-xs uppercase font-extrabold tracking-widest text-zinc-400 mb-3.5 flex items-center gap-1.5">
                       <Sparkles size={14} className="text-amber-500" />
-                      <span>Allergens Warning</span>
+                      <span>Allergen Profile</span>
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {dish.allergens.map((allergen) => (
                         <span
                           key={allergen.id}
-                          className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold px-3 py-1 rounded-xl"
+                          className="bg-red-500/5 border border-red-500/20 text-red-400 text-xs font-bold px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 shadow-sm"
                         >
-                          {allergen.name}
+                          <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
+                          <span>{allergen.name}</span>
                         </span>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* Ingredients Breakdown Table */}
+                {/* Ingredients Dashboard Capsules */}
                 <div>
-                  <h3 className="text-xs uppercase font-extrabold tracking-widest text-zinc-400 mb-3 flex items-center gap-1.5">
+                  <h3 className="text-xs uppercase font-extrabold tracking-widest text-zinc-400 mb-4 flex items-center gap-1.5">
                     <Info size={14} className="text-amber-500" />
-                    <span>Ingredients & Nutrition</span>
+                    <span>Ingredients & Portion Profile</span>
                   </h3>
                   
                   {dish.ingredients.length > 0 ? (
-                    <div className="border border-zinc-800/80 rounded-2xl overflow-hidden shadow-sm">
-                      <table className="w-full text-left border-collapse text-xs">
-                        <thead>
-                          <tr className="bg-zinc-900/60 border-b border-zinc-800/80">
-                            <th className="py-3 px-4 font-bold text-zinc-300">Ingredient</th>
-                            <th className="py-3 px-4 font-bold text-zinc-300 text-right">Quantity</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-zinc-800/40">
-                          {dish.ingredients.map((ing) => (
-                            <tr key={ing.id} className="hover:bg-zinc-900/20 transition-colors">
-                              <td className="py-3 px-4 font-medium text-zinc-200">{ing.name}</td>
-                              <td className="py-3 px-4 text-zinc-400 text-right font-semibold">
-                                {ing.quantity} {ing.unit}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                      {dish.ingredients.map((ing) => (
+                        <div 
+                          key={ing.id} 
+                          className="bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-4 flex items-center justify-between shadow-sm hover:border-amber-500/35 transition-all group"
+                        >
+                          <div className="flex flex-col">
+                            <span className="font-bold text-xs text-zinc-200 capitalize group-hover:text-amber-400 transition-colors">
+                              {ing.name}
+                            </span>
+                            <span className="text-[10px] text-zinc-500 font-semibold mt-0.5">
+                              Portion weight
+                            </span>
+                          </div>
+                          <div className="bg-zinc-950/80 border border-zinc-800 px-3 py-1 rounded-xl text-xs font-black text-amber-500 shadow-inner">
+                            {ing.quantity} {ing.unit}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   ) : (
                     <p className="text-xs text-zinc-500 italic">Ingredient ratios not specified.</p>
@@ -286,10 +289,10 @@ export default function ProductDetailModal({ dish, isOpen, onClose }: ProductDet
               </div>
 
               {/* Close / Action Row */}
-              <div className="mt-8 pt-4 border-t border-zinc-900 flex justify-end">
+              <div className="mt-10 pt-5 border-t border-zinc-900 flex justify-end">
                 <button
                   onClick={onClose}
-                  className="bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white py-2.5 px-6 rounded-xl hover:bg-zinc-800 transition-all font-semibold text-xs"
+                  className="bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white py-2.5 px-6 rounded-xl hover:bg-zinc-800 transition-all font-bold text-xs select-none cursor-pointer"
                 >
                   Close View
                 </button>
