@@ -62,8 +62,9 @@ const ModelViewer = forwardRef<ModelViewerRef, ModelViewerProps>(
               }).blob();
               
               if (active) {
-                objectUrl = URL.createObjectURL(blob);
-                setProcessedSrc(objectUrl);
+                const rawUrl = URL.createObjectURL(blob);
+                objectUrl = rawUrl;
+                setProcessedSrc(rawUrl + '#.glb');
               }
             } else {
               // Fallback to uncompressed file if DecompressionStream is missing
