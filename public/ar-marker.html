@@ -79,7 +79,7 @@
 
     <!-- UI instruction -->
     <div class="ui-overlay">
-      Point your camera at a <span class="highlight">HIRO Marker</span>
+      Point your camera at the <span class="highlight">MenuVerse Marker</span>
     </div>
 
     <!-- AR Scene -->
@@ -89,9 +89,10 @@
       renderer="logarithmicDepthBuffer: true; antialias: true; precision: medium; colorManagement: true;"
       vr-mode-ui="enabled: false"
     >
-      <!-- Preset Hiro Marker with Smoothing Enabled -->
+      <!-- Custom MenuVerse Pattern Marker with Smoothing Enabled -->
       <a-marker 
-        preset="hiro" 
+        type="pattern"
+        url="/logo.patt"
         id="hiro-marker"
         smooth="true"
         smoothCount="10"

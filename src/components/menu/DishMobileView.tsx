@@ -139,7 +139,7 @@ export default function DishMobileView({ dish }: DishMobileViewProps) {
                 href={`/ar-marker/${dish.id}`}
                 className="w-full flex items-center justify-center gap-2.5 bg-zinc-900 hover:bg-zinc-800 active:scale-95 text-zinc-200 hover:text-white font-bold py-3 px-6 rounded-xl border border-zinc-800 transition-all text-xs cursor-pointer select-none text-center"
               >
-                <span>Try Marker-Based AR (Fix to Hiro Marker)</span>
+                <span>Try Marker-Based AR (Fix to MenuVerse Marker)</span>
               </Link>
             </div>
           )}

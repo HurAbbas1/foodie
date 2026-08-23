@@ -194,7 +194,7 @@ export default function ProductDetailModal({ dish, isOpen, onClose }: ProductDet
                           href={`/ar-marker/${dish.id}`}
                           className="w-full sm:w-auto flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 active:scale-95 text-zinc-200 hover:text-white font-bold py-2.5 px-4 rounded-xl border border-zinc-800 transition-all text-xs cursor-pointer select-none text-center"
                         >
-                          <span>Hiro Marker AR</span>
+                          <span>MenuVerse Marker AR</span>
                         </Link>
                       </div>
                     </>
