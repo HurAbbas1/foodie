@@ -57,7 +57,9 @@ const ModelViewer = forwardRef<ModelViewerRef, ModelViewerProps>(
             if (typeof globalThis.DecompressionStream !== 'undefined') {
               const ds = new DecompressionStream('gzip');
               const decompressedStream = response.body!.pipeThrough(ds);
-              const blob = await new Response(decompressedStream).blob();
+              const blob = await new Response(decompressedStream, {
+                headers: { 'Content-Type': 'model/gltf-binary' }
+              }).blob();
               
               if (active) {
                 objectUrl = URL.createObjectURL(blob);
