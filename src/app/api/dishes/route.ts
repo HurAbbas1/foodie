@@ -1,19 +1,67 @@
 import { NextRequest, NextResponse } from 'next/server';
-import menuData from '@/data/menu.json';
+import { prisma } from '@/lib/prisma';
 
-// GET all dishes
+// GET all dishes from Prisma Postgres
 export async function GET() {
   try {
-    // Sort by createdAt descending
-    const sorted = [...menuData].sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
-    return NextResponse.json(sorted);
+    const dishes = await prisma.dish.findMany({
+      include: {
+        ingredients: true,
+        allergens: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+    return NextResponse.json(dishes);
   } catch (error: any) {
     console.error('Failed to fetch dishes:', error);
     return NextResponse.json({ error: error.message || 'Failed to fetch dishes' }, { status: 500 });
   }
 }
 
-// POST create new dish (Disabled in static JSON mode)
+// POST create new dish in Prisma Postgres
 export async function POST(req: NextRequest) {
-  return NextResponse.json({ error: 'Database is in read-only static mode on Vercel.' }, { status: 403 });
+  try {
+    const body = await req.json();
+    const { name, category, price, description, calories, modelUrl, usdzUrl, previewUrl, ingredients, allergens } = body;
+
+    if (!name || !category || price === undefined) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    const newDish = await prisma.dish.create({
+      data: {
+        name,
+        category,
+        price: parseFloat(price),
+        description: description || '',
+        calories: calories ? parseInt(calories) : null,
+        modelUrl: modelUrl || null,
+        usdzUrl: usdzUrl || null,
+        previewUrl: previewUrl || null,
+        ingredients: {
+          create: (ingredients || []).map((ing: any) => ({
+            name: ing.name,
+            quantity: parseFloat(ing.quantity || 0),
+            unit: ing.unit || 'g'
+          }))
+        },
+        allergens: {
+          create: (allergens || []).map((all: any) => ({
+            name: all.name
+          }))
+        }
+      },
+      include: {
+        ingredients: true,
+        allergens: true
+      }
+    });
+
+    return NextResponse.json(newDish);
+  } catch (error: any) {
+    console.error('Failed to create dish:', error);
+    return NextResponse.json({ error: error.message || 'Failed to create dish' }, { status: 500 });
+  }
 }
