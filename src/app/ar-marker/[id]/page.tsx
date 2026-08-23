@@ -14,16 +14,11 @@ export default async function ARMarkerPage({ params }: PageProps) {
     notFound();
   }
 
-  // Strip .gz extension so A-Frame gets a plain .glb URL it can parse natively
-  const arModelUrl = dish.modelUrl.endsWith('.gz')
-    ? dish.modelUrl.slice(0, -3) // removes trailing ".gz"
-    : dish.modelUrl;
-
   return (
     <ARMarkerClient
       dishId={dish.id}
       dishName={dish.name}
-      modelUrl={arModelUrl}
+      modelUrl={dish.modelUrl}
     />
   );
 }
